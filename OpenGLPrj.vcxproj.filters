@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Game.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\ResourceManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Shader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glad\src\glad.c">
+      <Filter>vendors</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\OpenGLPrj.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitattributes" />
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitignore" />
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitmodules" />
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\ReadMe.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{B13DAF51-C043-3001-A11F-62D133E2246A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{729621A0-9C86-3DB9-BAE0-7D78A09BCECB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendors">
+      <UniqueIdentifier>{C8A82E24-DF26-34B6-B695-D900AC497E43}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

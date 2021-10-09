@@ -1,7 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\BallObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Game.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameLevel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\PlayerObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\ResourceManager.cpp">
@@ -10,7 +22,16 @@
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Shader.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\SpriteRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\TextRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Utility.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\main.cpp">
@@ -21,7 +42,40 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\BallObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\Game.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameLevel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\OpenGLPrj.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\PlayerObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\ResourceManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\Shader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\SpriteRenderer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\TextRenderer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\Texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\Utility.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,6 +83,18 @@
     <CustomBuild Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\shaders\shader.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\shaders\shader.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\shaders\text.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\shaders\text.vs">
+      <Filter>shaders</Filter>
+    </None>
     <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitattributes" />
     <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitignore" />
     <None Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\.gitmodules" />
@@ -37,6 +103,9 @@
   <ItemGroup>
     <Filter Include="include">
       <UniqueIdentifier>{B13DAF51-C043-3001-A11F-62D133E2246A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{6E4F68F0-670E-3738-9C3E-249799BE078D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{729621A0-9C86-3DB9-BAE0-7D78A09BCECB}</UniqueIdentifier>

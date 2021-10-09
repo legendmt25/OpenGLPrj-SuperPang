@@ -1,0 +1,107 @@
+[
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe  -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp  -Wall -Wextra -Wpedantic -std=c++11 -g   -o CMakeFiles\\OpenGLPrj.dir\\src\\Game.cpp.obj -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\src\\Game.cpp",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/src/Game.cpp"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe  -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp  -Wall -Wextra -Wpedantic -std=c++11 -g   -o CMakeFiles\\OpenGLPrj.dir\\src\\ResourceManager.cpp.obj -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\src\\ResourceManager.cpp",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/src/ResourceManager.cpp"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe  -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp  -Wall -Wextra -Wpedantic -std=c++11 -g   -o CMakeFiles\\OpenGLPrj.dir\\src\\Shader.cpp.obj -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\src\\Shader.cpp",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/src/Shader.cpp"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe  -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp  -Wall -Wextra -Wpedantic -std=c++11 -g   -o CMakeFiles\\OpenGLPrj.dir\\src\\Texture.cpp.obj -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\src\\Texture.cpp",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/src/Texture.cpp"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe  -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp  -Wall -Wextra -Wpedantic -std=c++11 -g   -o CMakeFiles\\OpenGLPrj.dir\\src\\main.cpp.obj -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\src\\main.cpp",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/src/main.cpp"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\\\"C:/Users/trajk/Desktop/glitter/OpenGLPrj\\\" @CMakeFiles/OpenGLPrj.dir/includes_C.rsp -g   -o CMakeFiles\\OpenGLPrj.dir\\vendor\\glad\\src\\glad.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glad\\src\\glad.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glad/src/glad.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\context.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\context.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/context.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\init.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\init.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/init.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\input.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\input.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/input.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\monitor.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\monitor.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/monitor.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\vulkan.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\vulkan.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/vulkan.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\window.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\window.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/window.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_init.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_init.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_init.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_joystick.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_joystick.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_joystick.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_monitor.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_monitor.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_monitor.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_time.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_time.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_time.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_thread.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_thread.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_thread.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\win32_window.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\win32_window.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/win32_window.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\wgl_context.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\wgl_context.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/wgl_context.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\egl_context.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\egl_context.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/egl_context.c"
+},
+{
+  "directory": "C:/Users/trajk/Desktop/glitter/build/vendor/glfw/src",
+  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H @CMakeFiles/glfw.dir/includes_C.rsp -g   -Wall -Wdeclaration-after-statement -o CMakeFiles\\glfw.dir\\osmesa_context.c.obj   -c C:\\Users\\trajk\\Desktop\\glitter\\OpenGLPrj\\vendor\\glfw\\src\\osmesa_context.c",
+  "file": "C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/osmesa_context.c"
+}
+]

@@ -17,8 +17,6 @@
 [submodule "vendor/freetype"]
 	path = vendor/freetype
 	url = https://github.com/freetype/freetype.git
-	branch = master
 [submodule "vendor/irrKlang"]
 	path = vendor/irrKlang
 	url = https://github.com/tmpvar/node-irrklang.git
-	branch = master

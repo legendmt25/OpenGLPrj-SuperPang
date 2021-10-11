@@ -1,3 +1,9 @@
 [Bb]uild/
 /.vs/OpenGLPrj/v16
 /.vscode
+/.vs
+*.vcxproj
+/*.sln
+/x64
+/Debug
+/CMakeFiles

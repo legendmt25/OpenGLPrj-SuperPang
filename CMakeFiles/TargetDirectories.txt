@@ -1,9 +1,0 @@
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/CMakeFiles/OpenGLPrj.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/CMakeFiles/INSTALL.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/CMakeFiles/ALL_BUILD.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/CMakeFiles/ZERO_CHECK.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/CMakeFiles/uninstall.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/CMakeFiles/INSTALL.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/CMakeFiles/ALL_BUILD.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/CMakeFiles/glfw.dir
-C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/glfw/src/CMakeFiles/INSTALL.dir

@@ -30,3 +30,12 @@ void GameMenu::Draw(TextRenderer& Renderer) {
 		option.Draw(Renderer);
 	}
 }
+
+void GameMenu::loadMenuFromFile(const char* gameMenuFile) {
+	std::ifstream fileStream(gameMenuFile);
+	std::string line;
+	while (std::getline(fileStream, line)) {
+		std::stringstream stringStream(line);
+
+	}
+}

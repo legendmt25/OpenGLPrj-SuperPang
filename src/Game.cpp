@@ -52,6 +52,9 @@ void Game::LoadFiles() {
         level->Load(this->Width, this->Height);
         this->Levels.push_back(level);
     }
+
+    std::ifstream gameMenuFile("game.menu");
+
 }
 
 
@@ -96,17 +99,7 @@ void Game::Update(float dt)
             currentLevel.Reset();
             this->State = GAME_WIN;
         }
-
-        if (Player->Weapon != nullptr) {
-            if (Player->Weapon->Position.y > 0) {
-                Player->Weapon->Position.y -= Player->Weapon->Velocity.y * dt;
-                Player->Weapon->Size.y += Player->Weapon->Velocity.y * dt;
-            }
-            else {
-                delete Player->Weapon;
-                Player->Weapon = nullptr;
-            }
-        }
+        Player->Weapon->Move(dt, this->Width, this->Height);
     }
 }
 
@@ -161,7 +154,7 @@ void Game::ProcessInput(float dt)
 
         if (this->Keys[GLFW_KEY_X] || this->Keys[GLFW_KEY_SPACE]) {
             Player->Texture = ResourceManager::GetTexture("character-shoot");
-            if (Player->Weapon == nullptr) {
+            if (!Player->Weapon->Using) {
                 Player->Shoot();
             }
         }
@@ -205,7 +198,7 @@ void Game::Render()
 
     if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
         Renderer->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
-        if (Player->Weapon != nullptr) {
+        if (Player->Weapon->Using) {
             Player->Weapon->Draw(*Renderer);
         }
         Player->Draw(*Renderer);

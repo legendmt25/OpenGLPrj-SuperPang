@@ -2,8 +2,11 @@
 /.vs/OpenGLPrj/v16
 /.vscode
 /.vs
-*.vcxproj
+*.vcxproj*
 /*.sln
 /x64
 /Debug
 /CMakeFiles
+/*.dir
+CMakeCache*
+*.cmake

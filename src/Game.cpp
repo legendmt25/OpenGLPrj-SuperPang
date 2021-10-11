@@ -14,7 +14,6 @@
 #include "BallObject.h"
 #include "PlayerObject.h"
 #include "TextRenderer.h"
-#include "irrKlang.h"
 
 SpriteRenderer* Renderer = nullptr;
 PlayerObject* Player = nullptr;

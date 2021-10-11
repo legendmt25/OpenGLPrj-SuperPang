@@ -319,6 +319,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\BallObject.cpp" />
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\Game.cpp" />
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameLevel.cpp" />
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameMenu.cpp" />
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameObject.cpp" />
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\PlayerObject.cpp" />
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\ResourceManager.cpp" />
@@ -331,6 +332,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\BallObject.h" />
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\Game.h" />
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameLevel.h" />
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameMenu.h" />
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameObject.h" />
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\OpenGLPrj.hpp" />
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\PlayerObject.h" />

@@ -10,6 +10,9 @@
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameLevel.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\src\GameObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -49,6 +52,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameLevel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameMenu.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\include\GameObject.h">

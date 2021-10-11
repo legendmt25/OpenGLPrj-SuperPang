@@ -19,10 +19,14 @@ include_directories(include/
                     vendor/glad/include/
                     vendor/glfw/include/
                     vendor/glm/
-                    vendor/stb/)
+                    vendor/stb/
+		    vendor/freetype/include/
+		    vendor/irrKlang/include/)
 
 file(GLOB VENDORS_SOURCES vendor/glad/src/glad.c)
-file(GLOB PROJECT_HEADERS include/*.hpp)
+file(GLOB PROJECT_HEADERS include/*.hpp
+			  include/*.h)
+
 file(GLOB PROJECT_SOURCES src/*.cpp)
 file(GLOB PROJECT_SHADERS shaders/*.comp
                           shaders/*.frag
@@ -47,9 +51,6 @@ add_definitions(-DGLFW_INCLUDE_NONE
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES})
-target_link_libraries(${PROJECT_NAME}
-		      glfw
-                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
-		      )
+target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

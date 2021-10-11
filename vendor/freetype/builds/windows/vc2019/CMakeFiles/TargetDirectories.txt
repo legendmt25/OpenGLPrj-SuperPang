@@ -1,0 +1,5 @@
+C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/freetype/builds/windows/vc2019/CMakeFiles/PACKAGE.dir
+C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/freetype/builds/windows/vc2019/CMakeFiles/freetype.dir
+C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/freetype/builds/windows/vc2019/CMakeFiles/INSTALL.dir
+C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/freetype/builds/windows/vc2019/CMakeFiles/ALL_BUILD.dir
+C:/Users/trajk/Desktop/glitter/OpenGLPrj/vendor/freetype/builds/windows/vc2019/CMakeFiles/ZERO_CHECK.dir

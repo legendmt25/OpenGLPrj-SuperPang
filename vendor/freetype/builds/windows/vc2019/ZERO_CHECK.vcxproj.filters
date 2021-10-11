@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\freetype\builds\windows\vc2019\CMakeFiles\12f3ef5a4d2b7921647681bddeaa3961\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{84A892AD-9300-3B70-848A-ED6B4DF9A775}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

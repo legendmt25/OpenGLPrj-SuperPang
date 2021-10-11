@@ -34,7 +34,9 @@ public:
     ~Game();
 
     // initialize game state (load all shaders/textures/levels)
+
     void Init();
+    void LoadFiles();
     void ProcessInput(float dt);
     void Update(float dt);
     void Render();

@@ -71,13 +71,13 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned int levelHeight) {
 	for (auto& data : vData) {
 		if (data.type == "BALL") {
-			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("crystal_ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(130.0f, 190.0f)));
+			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(130.0f, 190.0f)));
 		}
 		if (data.type == "BLOCK") {
 			GameObject* obj = new GameObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
 			if (data.solid) {
 				obj->IsSolid = true;
-				obj->Texture = ResourceManager::GetTexture("block_solid");
+				obj->Texture = ResourceManager::GetTexture("block-solid");
 			}
 			this->Objects.push_back(obj);
 		}

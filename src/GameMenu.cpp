@@ -1,7 +1,12 @@
 #include <GameMenu.h>
 
-Option::Option(std::string Value, glm::vec2 Position, float FontSize)
+Option::Option(std::string Value, glm::vec2 Position, float FontSize, std::list<Option> Options)
 	:Value(Value), Position(Position), FontSize(FontSize), Selected(false) {}
+
+void Option::AlignCenter(unsigned int Width, unsigned int Height, float HeightOffset) {
+	float fontSize = 12.0f;
+	this->Position = glm::vec2((Width - Value.size() * fontSize) / 2.0f, Height / 2.0f + HeightOffset);
+}
 
 void Option::Draw(TextRenderer& Renderer) {
 	std::string h = "";

@@ -1,0 +1,16 @@
+﻿  GameMenu.cpp
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec2.hpp(46,22): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec2.hpp(217): message : see reference to class template instantiation 'glm::vec<2,T,Q>' being compiled
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec2.hpp(47,22): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec2.hpp(48,22): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec3.hpp(49,25): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec3.hpp(250): message : see reference to class template instantiation 'glm::vec<3,T,Q>' being compiled
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec3.hpp(50,25): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec3.hpp(51,25): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec4.hpp(46,29): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec4.hpp(322): message : see reference to class template instantiation 'glm::vec<4,T,Q>' being compiled
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec4.hpp(47,29): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_vec4.hpp(48,29): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_quat.hpp(58,28): warning C4201: nonstandard extension used: nameless struct/union
+C:\Users\trajk\Desktop\glitter\OpenGLPrj\vendor\glm\glm\ext\../detail/type_quat.hpp(137): message : see reference to class template instantiation 'glm::qua<T,Q>' being compiled
+  OpenGLPrj.vcxproj -> C:\Users\trajk\Desktop\glitter\OpenGLPrj\OpenGLPrj\Debug\OpenGLPrj.exe

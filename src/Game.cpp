@@ -4,6 +4,10 @@
 #include <cstring>
 #include <thread>
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <filesystem>
+#include <experimental/filesystem>
+
 #include "Game.h"
 #include "ResourceManager.h"
 #include "SpriteRenderer.h"
@@ -19,7 +23,7 @@ irrklang::ISoundEngine* SoundEngine = nullptr;
 const unsigned int lives = 5;
 
 Game::Game(unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Keys(), Width(width), Height(height), Lives(lives) {}
+    : State(GAME_MENU), Keys(), Width(width), Height(height), Lives(lives), Level(0) {}
 
 Game::~Game()
 {
@@ -32,71 +36,51 @@ Game::~Game()
     delete SoundEngine;
 }
 
-void Game::Init()
-{
-    ResourceManager::LoadShader("OpenGLPrj/shaders/shader.vs", "OpenGLPrj/shaders/shader.fs", NULL, "sprite");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/awesomeface.png", true, "face");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/background.jpg", false, "background_menu");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/block.png", false, "block");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/block_solid.png", false, "block_solid");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/paddle.png", true, "paddle");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/ball.png", true, "crystal_ball");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-init.png", true, "character-init");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-left-1.png", true, "character-walk-left-0");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-left-2.png", true, "character-walk-left-1");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-left-3.png", true, "character-walk-left-2");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-left-4.png", true, "character-walk-left-3");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-right-1.png", true, "character-walk-right-0");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-right-2.png", true, "character-walk-right-1");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-right-3.png", true, "character-walk-right-2");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-walk-right-4.png", true, "character-walk-right-3");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/character-shoot.png", true, "character-shoot");
-    ResourceManager::LoadTexture("OpenGLPrj/textures/arrow.png", true, "arrow");
-
-
-    GameLevel* one = new GameLevel("OpenGLPrj/levels/1.level");
-    one->Load(this->Width, this->Height);
-    GameLevel* two = new GameLevel("OpenGLPrj/levels/2.level");
-    two->Load(this->Width, this->Height);
-
-    std::string Value = "GAME START";
-    float fontSize = 12;
-    Option option1(Value, glm::vec2((this->Width - Value.size() * fontSize) / 2.0f, this->Height / 2.0f - 20.0f));
-
-    Value = "SETTINGS";
-    Option option2(Value, glm::vec2((this->Width - Value.size() * fontSize) / 2.0f, this->Height / 2.0f));
-    
-    Menu = GameMenu({ option1, option2 });
-
-    this->Levels = { one, two };
-    this->Level = 0;
-
-    for (int i = 1; i <= this->Levels.size(); ++i) {
-        char str[100] = "OpenGLPrj/levels/backgrounds/";
-        strcat(str, std::to_string(i).c_str());
-        strcat(str, ".png");
-
-        char ch[50] = "background";
-        strcat(ch, std::to_string(i).c_str());
-        ResourceManager::LoadTexture(str, false, ch);
+void Game::LoadFiles() {
+    ResourceManager::LoadShader("shaders/shader.vs", "shaders/shader.fs", NULL, "sprite");
+    std::vector<std::string> texturesDirectories = { "textures/", "levels/backgrounds/" };
+    //load textures
+    for (auto& dir : texturesDirectories) {
+        for (auto& file : std::experimental::filesystem::directory_iterator(dir)) {
+            ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 , file.path().filename().replace_extension().string());
+        }
     }
 
-    ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
+    //load levels
+    for (auto& file : std::experimental::filesystem::directory_iterator("levels/")) {
+        GameLevel* level = new GameLevel(file.path().string().c_str());
+        level->Load(this->Width, this->Height);
+        this->Levels.push_back(level);
+    }
+}
 
-    glm::mat4 projection = glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, -1.0f, 1.0f);
-    ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 
+void Game::Init()
+{
+    this->LoadFiles();
+    ResourceManager::GetShader("sprite").SetInteger("image", 0, true);
+    ResourceManager::GetShader("sprite").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, -1.0f, 1.0f));
+
+    //create game menu
+    Option option1("GAME START");
+    Option option2("SETTINGS");
+    option1.AlignCenter(this->Width, this->Height, -20.0f);
+    option2.AlignCenter(this->Width, this->Height, 0.0f);
+    this->Menu = GameMenu({ option1, option2 });
+
+    //init Player
+    glm::vec2 PlayerVelocity(500.0f);
+    glm::vec2 PlayerSize(50.0f, 50.0f);
+    glm::vec2 PlayerPosition((this->Width - PlayerSize.x) / 2.0f, this->Height - PlayerSize.y);
+    
+    //init objects
+    Player = new PlayerObject(PlayerPosition, PlayerSize, ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity);
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Text = new TextRenderer(this->Width, this->Height);
     SoundEngine = irrklang::createIrrKlangDevice();
 
-    glm::vec2 PlayerVelocity(500.0f);
-    glm::vec2 PlayerSize(50.0f, 50.0f);
-    glm::vec2 PlayerPosition((this->Width - PlayerSize.x) / 2.0f, this->Height - PlayerSize.y);
-    Player = new PlayerObject(PlayerPosition, PlayerSize, ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity);
-
-    Text->Load("OpenGLPrj/fonts/OCRAEXT.TTF", 24);
-    SoundEngine->play2D("OpenGLPrj/audio/breakout.mp3", true);
+    Text->Load("fonts/OCRAEXT.TTF", 24);
+    SoundEngine->play2D("audio/breakout.mp3", true);
 }
 
 void Game::Update(float dt)
@@ -127,7 +111,7 @@ void Game::Update(float dt)
 }
 
 unsigned int PlayerTexture = 0;
-float oldPositionX = 0;
+float frames = 0;
 
 void Game::ProcessInput(float dt)
 {
@@ -162,12 +146,15 @@ void Game::ProcessInput(float dt)
         
         if (!this->Keys[GLFW_KEY_RIGHT] && !this->Keys[GLFW_KEY_LEFT]) {
             Player->Texture = ResourceManager::GetTexture("character-init");
-            PlayerTexture = 0;
+            PlayerTexture = 1;
         }
         else {
-            if (abs(Player->Position.x - oldPositionX) > 100.0f) {
-                oldPositionX = Player->Position.x;
-                PlayerTexture = (PlayerTexture + 1) % 4;
+            if (frames >= 0.1f) {
+                frames = 0;
+                PlayerTexture = (PlayerTexture) % 4 + 1;
+            }
+            else {
+                frames += dt;
             }
             Player->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
         }
@@ -217,16 +204,14 @@ void Game::Render()
 {
 
     if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
-        char ch[50] = "background";
-        strcat(ch, std::to_string(this->Level + 1).c_str());
-        
-        Renderer->DrawSprite(ResourceManager::GetTexture(ch), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
-        Player->Draw(*Renderer);
-        this->Levels[this->Level]->Draw(*Renderer);
-        Text->RenderText("Lives:" + std::to_string(this->Lives), 5.0f, this->Height - 20.0f, 1.0f);
+        Renderer->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
         if (Player->Weapon != nullptr) {
             Player->Weapon->Draw(*Renderer);
         }
+        Player->Draw(*Renderer);
+        this->Levels[this->Level]->Draw(*Renderer);
+        Text->RenderText("Lives:" + std::to_string(this->Lives), 5.0f, this->Height - 20.0f, 1.0f);
+        
 
         if (this->State == GAME_PAUSE) {
             Text->RenderText("PAUSED", (this->Width - 72.0f * 5.0f) / 2.0f, this->Height / 2.0f - 20.0f, 5.0f);
@@ -234,7 +219,7 @@ void Game::Render()
     }
 
     if (this->State == GAME_MENU) {
-        Renderer->DrawSprite(ResourceManager::GetTexture("background_menu"), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
+        Renderer->DrawSprite(ResourceManager::GetTexture("background-menu"), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
         Menu.Draw(*Text);
     }
 

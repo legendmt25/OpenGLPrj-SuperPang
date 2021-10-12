@@ -1,5 +1,4 @@
 #include "BallObject.h"
-#include <tuple>
 
 BallObject::BallObject(glm::vec2 position, float radius, Texture2D texture, glm::vec3 color, glm::vec2 velocity, glm::vec2 gravity)
 	:GameObject(position, glm::vec2(2.0f * radius), texture, color, velocity), Radius(radius), Gravity(gravity) {}
@@ -26,10 +25,10 @@ Collision BallObject::checkCollision(GameObject& obj) {
 		difference = closest - center;
 
 		if (glm::length(difference) <= this->Radius) {
-			return std::make_tuple(true, VectorDirection(difference), difference);
+			return Collision(true, VectorDirection(difference), difference);
 		}
 		else {
-			return std::make_tuple(false, Direction::UP, glm::vec2(0.0f));
+			return Collision();
 		}
 }
 

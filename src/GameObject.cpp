@@ -19,10 +19,10 @@ Collision GameObject::checkCollision(GameObject& obj) {
     bool collision = collisionX && collisionY;
 
     if (collision) {
-        return std::make_tuple(true, UP, glm::vec2(0.0f));
+        return Collision(true);
     }
     else {
-        return std::make_tuple(false, Direction::UP, glm::vec2(0.0f));
+        return Collision(false);
     }
 }
 

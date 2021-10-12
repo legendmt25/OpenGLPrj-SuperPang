@@ -102,7 +102,6 @@ void GameLevel::Draw(SpriteRenderer& renderer) {
 }
 
 void GameLevel::Reset() {
-	delete[] this->file;
 	for (auto& object : this->Objects) {
 		delete object;
 	}

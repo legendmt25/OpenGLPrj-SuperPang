@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <thread>
+#include <chrono>
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <filesystem>
@@ -15,6 +16,7 @@
 #include "PlayerObject.h"
 #include "TextRenderer.h"
 #include "irrKlang.h"
+#include "Utility.h"
 
 SpriteRenderer* Renderer = nullptr;
 PlayerObject* Player = nullptr;
@@ -94,14 +96,33 @@ void Game::Update(float dt)
         for (auto& object : this->Levels[Level]->Objects) {
             object->Move(dt, this->Width, this->Height);
         }
+
         this->DoCollisions();
 
-        GameLevel& currentLevel = *(this->Levels[Level]);
+        GameLevel& currentLevel = *this->Levels[Level];
         if (currentLevel.isCompleted()) {
+            if (this->Level == this->Levels.size() - 1) {
+                this->State = GAME_WIN;
+            }
+            else {
+                ++this->Level;
+            }
             currentLevel.Reset();
-            this->State = GAME_WIN;
         }
-        Player->Weapon->Move(dt, this->Width, this->Height);
+
+        for (auto& Weapon : Player->Weapons) {
+            if (Weapon->Using) {
+                Weapon->Move(dt, this->Width, this->Height);
+            }
+            else {
+                Weapon->Using = false;
+                Weapon->Reset();
+            }
+        }
+
+        if (this->Lives == 0) {
+            this->State = GAME_MENU;
+        }
     }
 }
 
@@ -154,16 +175,17 @@ void Game::ProcessInput(float dt)
             Player->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
         }
 
-        if (this->Keys[GLFW_KEY_X] || this->Keys[GLFW_KEY_SPACE]) {
+        if ((this->Keys[GLFW_KEY_SPACE] && !this->KeysProcessed[GLFW_KEY_SPACE]) || (this->Keys[GLFW_KEY_X] && !this->KeysProcessed[GLFW_KEY_X])) {
             Player->Texture = ResourceManager::GetTexture("character-shoot");
-            if (!Player->Weapon->Using) {
-                Player->Shoot();
-            }
+            Player->Shoot();
+            this->KeysProcessed[GLFW_KEY_SPACE] = true;
+            this->KeysProcessed[GLFW_KEY_X] = true;
         }
     }
 
     if (this->State == GAME_MENU) {
         if (this->Keys[GLFW_KEY_ENTER] && this->Menu.Selected == 0 && !this->KeysProcessed[GLFW_KEY_ENTER]) {
+            this->Reset();
             this->State = GAME_ACTIVE;
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
         }
@@ -200,8 +222,10 @@ void Game::Render()
 
     if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
         Renderer->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
-        if (Player->Weapon->Using) {
-            Player->Weapon->Draw(*Renderer);
+        for (auto& Weapon : Player->Weapons) {
+            if (Weapon->Using) {
+                Weapon->Draw(*Renderer);
+            }
         }
         Player->Draw(*Renderer);
         this->Levels[this->Level]->Draw(*Renderer);
@@ -226,12 +250,33 @@ void Game::Render()
 }
 
 void Game::DoCollisions() {
+    for (auto& object : this->Levels[this->Level]->Objects) {
+        if (!object->Destroyed) {
+            Collision& collisionPlayer = object->checkCollision(*Player);
+            if (collisionPlayer.collision) {
+                --this->Lives;
+                SoundEngine->stopAllSounds();
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                this->Levels[Level]->Reset();
+                Player->Reset(glm::vec2((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y), glm::vec2(500.0f));
+                SoundEngine->play2D("../audio/breakout.mp3", true);
+            }
 
+            for (auto& Weapon : Player->Weapons) {
+                Collision& collisionWeapon = object->checkCollision(*Weapon);
+                if (Weapon->Using && collisionWeapon.collision) {
+                    object->Destroyed = true;
+                    Weapon->Using = false;
+                    Weapon->Reset();
+                }
+            }
+        }
+    }
 }
 
 void Game::Reset() {
+    Player->Reset(glm::vec2((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y), glm::vec2(500.0f));
     this->Level = 0;
     this->Levels[this->Level]->Reset();
-    this->State = GAME_MENU;
     this->Lives = lives;
 }

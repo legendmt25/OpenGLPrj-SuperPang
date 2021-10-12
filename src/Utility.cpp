@@ -19,3 +19,6 @@ Direction VectorDirection(glm::vec2 target) {
     }
     return (Direction) best;
 }
+
+Collision::Collision(bool collision, Direction direction, glm::vec2 difference)
+    :collision(collision), direction(direction), difference(difference) {}

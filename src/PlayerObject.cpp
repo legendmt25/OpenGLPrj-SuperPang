@@ -2,11 +2,14 @@
 #include "ResourceManager.h"
 
 PlayerObject::PlayerObject()
-    :GameObject(), Weapon(nullptr) {}
+    :GameObject() {}
 
-PlayerObject::PlayerObject(glm::vec2 position, glm::vec2 size, Texture2D texture, glm::vec3 color, glm::vec2 velocity) 
-    :GameObject(position, size, texture, color, velocity), 
-    Weapon(new WeaponObject(glm::vec2(this->Position.x + this->Size.x / 2.0f, this->Position.y + this->Size.y), glm::vec2(20.0f), ResourceManager::GetTexture("arrow"), glm::vec3(1.0f), glm::vec2(500.0f))) {}
+PlayerObject::PlayerObject(glm::vec2 position, glm::vec2 size, Texture2D texture, glm::vec3 color, glm::vec2 velocity)
+    : GameObject(position, size, texture, color, velocity)
+{
+    this->Weapons.push_back(new ArrowObject(*this, glm::vec2(500.0f)));
+    this->Weapons.push_back(new PowerArrowObject(*this, glm::vec2(500.0f)));
+}
 
 void PlayerObject::Reset(glm::vec2 position, glm::vec2 velocity) {
     this->Position = position;
@@ -14,7 +17,17 @@ void PlayerObject::Reset(glm::vec2 position, glm::vec2 velocity) {
 }
 
 void PlayerObject::Shoot() {
-    this->Weapon->Reset(glm::vec2(this->Position.x + this->Size.x / 2.0f, this->Position.y + this->Size.y), glm::vec2(20.0f));
-    this->Weapon->UseWeapon();
+    for (auto& Weapon : this->Weapons) {
+        if (!Weapon->Using) {
+            Weapon->UseWeapon();
+            break;
+        }
+    }
+}
+
+PlayerObject::~PlayerObject() {
+    for (auto& Weapon : this->Weapons) {
+        delete Weapon;
+    }
 }
 

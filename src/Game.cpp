@@ -14,6 +14,7 @@
 #include "BallObject.h"
 #include "PlayerObject.h"
 #include "TextRenderer.h"
+#include "irrKlang.h"
 
 SpriteRenderer* Renderer = nullptr;
 PlayerObject* Player = nullptr;
@@ -36,8 +37,10 @@ Game::~Game()
 }
 
 void Game::LoadFiles() {
-    ResourceManager::LoadShader("shaders/shader.vs", "shaders/shader.fs", NULL, "sprite");
-    std::vector<std::string> texturesDirectories = { "textures/", "levels/backgrounds/" };
+    //load shaders
+    ResourceManager::LoadShader("../shaders/shader.vs", "../shaders/shader.fs", NULL, "sprite");
+    ResourceManager::LoadShader("../shaders/text.vs", "../shaders/text.fs", NULL, "text");
+    std::vector<std::string> texturesDirectories = { "../textures/", "../levels/backgrounds/" };
     //load textures
     for (auto& dir : texturesDirectories) {
         for (auto& file : std::experimental::filesystem::directory_iterator(dir)) {
@@ -46,7 +49,7 @@ void Game::LoadFiles() {
     }
 
     //load levels
-    for (auto& file : std::experimental::filesystem::directory_iterator("levels/")) {
+    for (auto& file : std::experimental::filesystem::directory_iterator("../levels/")) {
         GameLevel* level = new GameLevel(file.path().string().c_str());
         level->Load(this->Width, this->Height);
         this->Levels.push_back(level);
@@ -81,8 +84,8 @@ void Game::Init()
     Text = new TextRenderer(this->Width, this->Height);
     SoundEngine = irrklang::createIrrKlangDevice();
 
-    Text->Load("fonts/OCRAEXT.TTF", 24);
-    SoundEngine->play2D("audio/breakout.mp3", true);
+    Text->Load("../fonts/OCRAEXT.TTF", 24);
+    SoundEngine->play2D("../audio/breakout.mp3", true);
 }
 
 void Game::Update(float dt)

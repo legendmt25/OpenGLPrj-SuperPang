@@ -17,6 +17,3 @@
 [submodule "vendor/freetype"]
 	path = vendor/freetype
 	url = https://github.com/freetype/freetype.git
-[submodule "vendor/irrKlang"]
-	path = vendor/irrKlang
-	url = https://github.com/tmpvar/node-irrklang.git

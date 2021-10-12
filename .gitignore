@@ -6,7 +6,7 @@
 /*.sln
 /x64
 /Debug
-/CMakeFiles
+*/CMakeFiles
 /*.dir
 CMakeCache*
 *.cmake

@@ -16,24 +16,24 @@ float clamp(float value, float minn, float maxx) {
 }
 
 Collision BallObject::checkCollision(GameObject& obj) {
-	glm::vec2 center(this->Position + this->Radius);
-		// calculate AABB info (center, half-extents)
-		glm::vec2 rectangle_half_extents(obj.Size.x / 2.0f, obj.Size.y / 2.0f);
-		glm::vec2 rectangle_center(obj.Position.x + rectangle_half_extents.x, obj.Position.y + rectangle_half_extents.y);
+	glm::vec2 center(this->Position);
+	// calculate AABB info (center, half-extents)
+	glm::vec2 rectangle_half_extents(obj.Size.x / 2.0f, obj.Size.y / 2.0f);
+	glm::vec2 rectangle_center(obj.Position.x, obj.Position.y);
 
-		glm::vec2 difference = center - rectangle_center;
-		glm::vec2 clamped = glm::clamp(difference, -rectangle_half_extents, rectangle_half_extents);
-		// add clamped value to AABB_center and we get the value of box closest to circle
-		glm::vec2 closest = rectangle_center + clamped;
+	glm::vec2 difference = center - rectangle_center;
+	glm::vec2 clamped = glm::clamp(difference, -rectangle_half_extents, rectangle_half_extents);
+	// add clamped value to AABB_center and we get the value of box closest to circle
+	glm::vec2 closest = rectangle_center + clamped;
 		
-		difference = closest - center;
+	difference = closest - center;
 
-		if (glm::length(difference) <= this->Radius / 2.0f) {
-			return Collision(true, VectorDirection(difference), difference);
-		}
-		else {
-			return Collision();
-		}
+	if (glm::length(difference) <= this->Radius) {
+		return Collision(true, VectorDirection(difference), difference);
+	}
+	else {
+		return Collision();
+	}
 }
 
 glm::vec3& BallObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {

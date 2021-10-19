@@ -65,9 +65,7 @@ void Game::LoadFiles() {
 
 }
 
-glm::vec3 camPosition(0.0f, 0.0f, 0.000001f);
-glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
-glm::vec3 camFront(0.0f, 0.0f, 0.0f);
+
 
 void Game::Init()
 {
@@ -77,6 +75,7 @@ void Game::Init()
 
     ResourceManager::GetShader("sprite3D").SetInteger("image", 0, true);
     ResourceManager::GetShader("sprite3D").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, 0.0f, 1.0f));
+    ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::mat4(1.0f));
 
     //create game menu
     Option option1("GAME START");
@@ -104,7 +103,7 @@ void Game::Init()
 void Game::Update(float dt)
 {
     //std::cout << camPosition.x << " " << camPosition.y << " " << camPosition.z << std::endl;
-    ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::lookAt(camPosition, camPosition * camFront, worldUp), true);
+    //ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::lookAt(camPosition, camPosition * camFront, worldUp), true);
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
             object->Move(dt, this->Width, this->Height);
@@ -157,35 +156,17 @@ void Game::ProcessInput(float dt)
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
         }
 
-        float camVelocity = 20.0f;
-
-        if (this->Keys[GLFW_KEY_W]) {
-            camPosition.z -= camVelocity * dt;
-        }
-
-        if (this->Keys[GLFW_KEY_S]) {
-            camPosition.z += camVelocity * dt;
-        }
-
-        if (this->Keys[GLFW_KEY_A]) {
-            camPosition.x -= camVelocity * dt;
-        }
-
-        if (this->Keys[GLFW_KEY_D]) {
-            camPosition.x += camVelocity * dt;
-        }
-
         std::string direction = "";
 
         if (this->Keys[GLFW_KEY_LEFT]) {
-            if (Player->Position.x >= 0) {
+            if (Player->Position.x >= Player->Size.x / 2.0f) {
                 Player->Position.x -= Player->Velocity.x * dt;
             }
             direction = "-left-";
         }
 
         if (this->Keys[GLFW_KEY_RIGHT]) {
-            if (Player->Position.x + Player->Size.x <= this->Width) {
+            if (Player->Position.x <= this->Width - Player->Size.x / 2.0f) {
                 Player->Position.x += Player->Velocity.x * dt;
             }
             direction = "-right-";
@@ -285,7 +266,7 @@ void Game::Render()
 void Game::DoCollisions() {
     for (auto& object : this->Levels[this->Level]->Objects) {
         if (!object->Destroyed && dynamic_cast<BallObject*>(object) != nullptr) {
-            Collision& collisionPlayer = Player->checkCollision(*object);
+            Collision& collisionPlayer = object->checkCollision(*Player);
             if (collisionPlayer.collision) {
                 --this->Lives;
                 SoundEngine->stopAllSounds();
@@ -296,7 +277,7 @@ void Game::DoCollisions() {
             }
 
             for (auto& Weapon : Player->Weapons) {
-                Collision& collisionWeapon = Weapon->checkCollision(*object);
+                Collision& collisionWeapon = object->checkCollision(*Weapon);
                 if (Weapon->Using && collisionWeapon.collision) {
                     if (dynamic_cast<BallObject*>(object) != nullptr) {
                         object->Destroyed = true;

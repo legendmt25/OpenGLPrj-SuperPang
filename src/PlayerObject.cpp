@@ -4,14 +4,14 @@
 PlayerObject::PlayerObject()
     :GameObject() {}
 
-PlayerObject::PlayerObject(glm::vec2 position, glm::vec2 size, Texture2D texture, glm::vec3 color, glm::vec2 velocity)
+PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
     : GameObject(position, size, texture, color, velocity)
 {
-    this->Weapons.push_back(new ArrowObject(*this, glm::vec2(500.0f)));
-    this->Weapons.push_back(new PowerArrowObject(*this, glm::vec2(500.0f)));
+    this->Weapons.push_back(new ArrowObject(*this, glm::vec3(500.0f)));
+    this->Weapons.push_back(new PowerArrowObject(*this, glm::vec3(500.0f)));
 }
 
-void PlayerObject::Reset(glm::vec2 position, glm::vec2 velocity) {
+void PlayerObject::Reset(glm::vec3 position, glm::vec3 velocity) {
     this->Position = position;
     this->Velocity = velocity;
 }

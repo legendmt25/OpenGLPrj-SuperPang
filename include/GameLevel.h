@@ -1,15 +1,15 @@
 #include <vector>
 
-#include "SpriteRenderer.h"
+#include "Sprite3DRenderer.h"
 #include "BallObject.h"
 
 class Data {
 public:
 	std::string type;
-	glm::vec2 pos;
-	glm::vec2 size;
+	glm::vec3 pos;
+	glm::vec3 size;
 	bool solid;
-	Data(std::string type, glm::vec2 pos, glm::vec2 size, bool solid)
+	Data(std::string type, glm::vec3 pos, glm::vec3 size, bool solid)
 		:type(type), pos(pos), size(size), solid(solid) {}
 };
 
@@ -22,7 +22,7 @@ public:
 	GameLevel(const char* file);
 	~GameLevel();
 	void Load(unsigned int windowWidth, unsigned int windowHeight);
-	void Draw(SpriteRenderer& renderer);
+	void Draw(Sprite3DRenderer& renderer);
 	bool isCompleted();
 	void Reset();
 public:

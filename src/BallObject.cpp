@@ -1,7 +1,11 @@
 #include "BallObject.h"
 
-BallObject::BallObject(glm::vec2 position, float radius, Texture2D texture, glm::vec3 color, glm::vec2 velocity, glm::vec2 gravity)
-	:GameObject(position, glm::vec2(2.0f * radius), texture, color, velocity), Radius(radius), Gravity(gravity) {}
+BallObject::BallObject(glm::vec3 position, float radius, Texture2D texture, glm::vec3 color, glm::vec3 velocity, glm::vec3 gravity)
+	:GameObject(position, glm::vec3(2.0f * radius, 2.0f * radius, 1.0f), texture, color, velocity), Radius(radius), Gravity(gravity)
+{
+	this->Position.x += radius;
+	this->Position.y += radius;
+}
 
 BallObject::BallObject()
 	:GameObject(), Radius(12.5f) {}
@@ -24,7 +28,7 @@ Collision BallObject::checkCollision(GameObject& obj) {
 		
 		difference = closest - center;
 
-		if (glm::length(difference) <= this->Radius) {
+		if (glm::length(difference) <= this->Radius / 2.0f) {
 			return Collision(true, VectorDirection(difference), difference);
 		}
 		else {
@@ -32,26 +36,26 @@ Collision BallObject::checkCollision(GameObject& obj) {
 		}
 }
 
-glm::vec2& BallObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
+glm::vec3& BallObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
 
 	this->Position += this->Velocity * dt;
 	this->Velocity += this->Gravity;
-	if (this->Position.x + this->Size.x > windowWidth || this->Position.x < 0) {
+	if (this->Position.x + this->Size.x / 2.0f > windowWidth || this->Position.x < this->Size.x / 2.0f) {
 		this->Velocity.x *= -1.0f;
 	}
-	if (this->Position.y <= 0) {
+	if (this->Position.y <= this->Size.y / 2.0f) {
 		this->Velocity.y *= 1.0f;
-		this->Position.y = 0;
+		this->Position.y = this->Size.y / 2.0f;
 	}
 
-	if (this->Position.y + this->Size.y >= windowHeight) {
+	if (this->Position.y - this->Size.y / 2.0f >= windowHeight - this->Size.y) {
 		this->Velocity.y *= -1.0f;
-		this->Position.y = windowHeight - this->Size.y;
+		this->Position.y = windowHeight - this->Size.y / 2.0f;
 	}
 	return this->Position;
 }
 
-void BallObject::Reset(glm::vec2 position, glm::vec2 velocity) {
+void BallObject::Reset(glm::vec3 position, glm::vec3 velocity) {
 	this->Position = position;
 	this->Velocity = velocity;
 }

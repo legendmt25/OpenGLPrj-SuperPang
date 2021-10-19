@@ -40,8 +40,8 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 		while (std::getline(fstream, line)) {
 			sstream = std::istringstream(line);
 			std::string type;
-			glm::vec2 position;
-			glm::vec2 size;
+			glm::vec3 position;
+			glm::vec3 size;
 			bool solid;
 
 			sstream >> type;
@@ -59,6 +59,9 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 			size.x = size.x / width * (float)windowWidth;
 			size.y = size.y / height * (float)windowHeight;
 
+			position.z = 0.0f;
+			size.z = 1.0f;
+
 			sstream >> solid;
 			vData.push_back(Data(type, position, size, solid));
 		}
@@ -71,10 +74,10 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned int levelHeight) {
 	for (auto& data : vData) {
 		if (data.type == "BALL") {
-			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(130.0f, 190.0f)));
+			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
 		}
 		if (data.type == "BLOCK") {
-			GameObject* obj = new GameObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
+			GameObject* obj = new GameObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(0.0f), glm::vec3(0.0f));
 			if (data.solid) {
 				obj->IsSolid = true;
 				obj->Texture = ResourceManager::GetTexture("block-solid");
@@ -93,10 +96,10 @@ bool GameLevel::isCompleted() {
 	return true;
 }
 
-void GameLevel::Draw(SpriteRenderer& renderer) {
+void GameLevel::Draw(Sprite3DRenderer& Renderer3D) {
 	for (auto& object : this->Objects) {
 		if (!object->Destroyed) {
-			object->Draw(renderer);
+			object->Draw(Renderer3D);
 		}
 	}
 }

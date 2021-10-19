@@ -14,11 +14,11 @@ const unsigned int SCREEN_WIDTH = 1280;
 const unsigned int SCREEN_HEIGHT = 720;
 bool fullScreen = false;
 
-Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
+Game SuperPang(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main(int argc, char* argv[])
 {
-    GLFWwindow* window = initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout");
+    GLFWwindow* window = initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "SuperPang");
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Breakout.Init();
+    SuperPang.Init();
 
     // deltaTime variables
     // -------------------
@@ -42,14 +42,14 @@ int main(int argc, char* argv[])
         lastFrame = currentFrame;
         glfwPollEvents();
 
-        Breakout.ProcessInput(deltaTime);
+        SuperPang.ProcessInput(deltaTime);
 
-        Breakout.Update(deltaTime);
+        SuperPang.Update(deltaTime);
 
         glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        Breakout.Render();
+        SuperPang.Render();
 
         glfwSwapBuffers(window);
     }
@@ -103,9 +103,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key >= 0 && key < 1024)
     {
         if (action == GLFW_PRESS)
-            Breakout.Keys[key] = true;
+            SuperPang.Keys[key] = true;
         else if (action == GLFW_RELEASE)
-            Breakout.Keys[key] = Breakout.KeysProcessed[key] = false;
+            SuperPang.Keys[key] = SuperPang.KeysProcessed[key] = false;
     }
 }
 

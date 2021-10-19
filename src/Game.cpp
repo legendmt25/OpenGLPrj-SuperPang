@@ -12,6 +12,7 @@
 #include "Game.h"
 #include "ResourceManager.h"
 #include "SpriteRenderer.h"
+#include "Sprite3DRenderer.h"
 #include "BallObject.h"
 #include "PlayerObject.h"
 #include "TextRenderer.h"
@@ -19,6 +20,7 @@
 #include "Utility.h"
 
 SpriteRenderer* Renderer = nullptr;
+Sprite3DRenderer* Renderer3D = nullptr;
 PlayerObject* Player = nullptr;
 TextRenderer* Text = nullptr;
 irrklang::ISoundEngine* SoundEngine = nullptr;
@@ -33,6 +35,7 @@ Game::~Game()
         delete level;
     }
     delete Renderer;
+    delete Renderer3D;
     delete Player;
     delete Text;
     delete SoundEngine;
@@ -40,8 +43,9 @@ Game::~Game()
 
 void Game::LoadFiles() {
     //load shaders
-    ResourceManager::LoadShader("../shaders/shader.vs", "../shaders/shader.fs", NULL, "sprite");
+    ResourceManager::LoadShader("../shaders/sprite.vs", "../shaders/sprite.fs", NULL, "sprite");
     ResourceManager::LoadShader("../shaders/text.vs", "../shaders/text.fs", NULL, "text");
+    ResourceManager::LoadShader("../shaders/sprite3D.vs", "../shaders/sprite3D.fs", NULL, "sprite3D");
     std::vector<std::string> texturesDirectories = { "../textures/", "../levels/backgrounds/" };
     //load textures
     for (auto& dir : texturesDirectories) {
@@ -61,12 +65,18 @@ void Game::LoadFiles() {
 
 }
 
+glm::vec3 camPosition(0.0f, 0.0f, 0.000001f);
+glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+glm::vec3 camFront(0.0f, 0.0f, 0.0f);
 
 void Game::Init()
 {
     this->LoadFiles();
     ResourceManager::GetShader("sprite").SetInteger("image", 0, true);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, -1.0f, 1.0f));
+
+    ResourceManager::GetShader("sprite3D").SetInteger("image", 0, true);
+    ResourceManager::GetShader("sprite3D").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, 0.0f, 1.0f));
 
     //create game menu
     Option option1("GAME START");
@@ -76,13 +86,14 @@ void Game::Init()
     this->Menu = GameMenu({ option1, option2 });
 
     //init Player
-    glm::vec2 PlayerVelocity(500.0f);
-    glm::vec2 PlayerSize(50.0f, 50.0f);
-    glm::vec2 PlayerPosition((this->Width - PlayerSize.x) / 2.0f, this->Height - PlayerSize.y);
+    glm::vec3 PlayerVelocity(500.0f);
+    glm::vec3 PlayerSize(50.0f, 50.0f, 1.0f);
+    //glm::vec3 PlayerPosition(0.0f, 0.0f, 0.0f);
     
     //init objects
-    Player = new PlayerObject(PlayerPosition, PlayerSize, ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity);
+    Player = new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity);
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+    Renderer3D = new Sprite3DRenderer(ResourceManager::GetShader("sprite3D"));
     Text = new TextRenderer(this->Width, this->Height);
     SoundEngine = irrklang::createIrrKlangDevice();
 
@@ -92,6 +103,8 @@ void Game::Init()
 
 void Game::Update(float dt)
 {
+    //std::cout << camPosition.x << " " << camPosition.y << " " << camPosition.z << std::endl;
+    ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::lookAt(camPosition, camPosition * camFront, worldUp), true);
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
             object->Move(dt, this->Width, this->Height);
@@ -142,6 +155,24 @@ void Game::ProcessInput(float dt)
         if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
             this->State = GAME_PAUSE;
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
+        }
+
+        float camVelocity = 20.0f;
+
+        if (this->Keys[GLFW_KEY_W]) {
+            camPosition.z -= camVelocity * dt;
+        }
+
+        if (this->Keys[GLFW_KEY_S]) {
+            camPosition.z += camVelocity * dt;
+        }
+
+        if (this->Keys[GLFW_KEY_A]) {
+            camPosition.x -= camVelocity * dt;
+        }
+
+        if (this->Keys[GLFW_KEY_D]) {
+            camPosition.x += camVelocity * dt;
         }
 
         std::string direction = "";
@@ -221,14 +252,16 @@ void Game::Render()
 {
 
     if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
-        Renderer->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
+        Renderer3D->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec3(this->Width / 2.0f, this->Height / 2.0f, 0.0f), glm::vec3(this->Width, this->Height, 1.0f), 0.0f, glm::vec3(1.0f));
+        
         for (auto& Weapon : Player->Weapons) {
             if (Weapon->Using) {
-                Weapon->Draw(*Renderer);
+                Weapon->Draw(*Renderer3D);
             }
         }
-        Player->Draw(*Renderer);
-        this->Levels[this->Level]->Draw(*Renderer);
+        
+        Player->Draw(*Renderer3D);
+        this->Levels[this->Level]->Draw(*Renderer3D);
         Text->RenderText("Lives:" + std::to_string(this->Lives), 5.0f, this->Height - 20.0f, 1.0f);
         
 
@@ -251,21 +284,23 @@ void Game::Render()
 
 void Game::DoCollisions() {
     for (auto& object : this->Levels[this->Level]->Objects) {
-        if (!object->Destroyed) {
-            Collision& collisionPlayer = object->checkCollision(*Player);
+        if (!object->Destroyed && dynamic_cast<BallObject*>(object) != nullptr) {
+            Collision& collisionPlayer = Player->checkCollision(*object);
             if (collisionPlayer.collision) {
                 --this->Lives;
                 SoundEngine->stopAllSounds();
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 this->Levels[Level]->Reset();
-                Player->Reset(glm::vec2((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y), glm::vec2(500.0f));
+                Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f));
                 SoundEngine->play2D("../audio/breakout.mp3", true);
             }
 
             for (auto& Weapon : Player->Weapons) {
-                Collision& collisionWeapon = object->checkCollision(*Weapon);
+                Collision& collisionWeapon = Weapon->checkCollision(*object);
                 if (Weapon->Using && collisionWeapon.collision) {
-                    object->Destroyed = true;
+                    if (dynamic_cast<BallObject*>(object) != nullptr) {
+                        object->Destroyed = true;
+                    }
                     Weapon->Using = false;
                     Weapon->Reset();
                 }
@@ -275,7 +310,7 @@ void Game::DoCollisions() {
 }
 
 void Game::Reset() {
-    Player->Reset(glm::vec2((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y), glm::vec2(500.0f));
+    Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
     this->Level = 0;
     this->Levels[this->Level]->Reset();
     this->Lives = lives;

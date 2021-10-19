@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(OpenGLPrj)
 
+SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/Debug)
+SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/bin/Release)
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
@@ -65,6 +67,14 @@ file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/ikpMP3.dll
 file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/irrKlang.dll
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/Debug)
 
+file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/ikpFlac.dll
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/Release)
+
+file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/ikpMP3.dll
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/Release)
+
+file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/irrKlang.dll
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/Release)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

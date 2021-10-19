@@ -21,5 +21,6 @@ public:
 	virtual Collision checkCollision(GameObject&);
 	virtual void Draw(Sprite3DRenderer& renderer);
 	virtual glm::vec3& Move(float dt, unsigned int window_width, unsigned int window_height);
+	virtual void ProcessInput(float dt, unsigned int window_width, unsigned int window_height);
 	virtual void Reset();
 };

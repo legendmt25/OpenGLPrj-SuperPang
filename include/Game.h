@@ -23,8 +23,8 @@ public:
     // game state
     GameMenu Menu;
     GameState State;	
-    bool Keys[1024];
-    bool KeysProcessed[1024];
+    static bool Keys[1024];
+    static bool KeysProcessed[1024];
     unsigned int Width, Height;
     std::vector<GameLevel*> Levels;
     unsigned int Level;

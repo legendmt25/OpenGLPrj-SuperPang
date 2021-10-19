@@ -25,9 +25,11 @@ PlayerObject* Player = nullptr;
 TextRenderer* Text = nullptr;
 irrklang::ISoundEngine* SoundEngine = nullptr;
 const unsigned int lives = 5;
+bool Game::Keys[1024] = { 0 };
+bool Game::KeysProcessed[1024] = { 0 };
 
 Game::Game(unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Keys(), Width(width), Height(height), Lives(lives), Level(0) {}
+    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0) {}
 
 Game::~Game()
 {
@@ -102,8 +104,6 @@ void Game::Init()
 
 void Game::Update(float dt)
 {
-    //std::cout << camPosition.x << " " << camPosition.y << " " << camPosition.z << std::endl;
-    //ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::lookAt(camPosition, camPosition * camFront, worldUp), true);
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
             object->Move(dt, this->Width, this->Height);
@@ -138,8 +138,6 @@ void Game::Update(float dt)
     }
 }
 
-unsigned int PlayerTexture = 0;
-float frames = 0;
 
 void Game::ProcessInput(float dt)
 {
@@ -156,43 +154,8 @@ void Game::ProcessInput(float dt)
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
         }
 
-        std::string direction = "";
+        Player->ProcessInput(dt, this->Width, this->Height);
 
-        if (this->Keys[GLFW_KEY_LEFT]) {
-            if (Player->Position.x >= Player->Size.x / 2.0f) {
-                Player->Position.x -= Player->Velocity.x * dt;
-            }
-            direction = "-left-";
-        }
-
-        if (this->Keys[GLFW_KEY_RIGHT]) {
-            if (Player->Position.x <= this->Width - Player->Size.x / 2.0f) {
-                Player->Position.x += Player->Velocity.x * dt;
-            }
-            direction = "-right-";
-        }
-        
-        if (!this->Keys[GLFW_KEY_RIGHT] && !this->Keys[GLFW_KEY_LEFT]) {
-            Player->Texture = ResourceManager::GetTexture("character-init");
-            PlayerTexture = 1;
-        }
-        else {
-            if (frames >= 0.1f) {
-                frames = 0;
-                PlayerTexture = (PlayerTexture) % 4 + 1;
-            }
-            else {
-                frames += dt;
-            }
-            Player->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
-        }
-
-        if ((this->Keys[GLFW_KEY_SPACE] && !this->KeysProcessed[GLFW_KEY_SPACE]) || (this->Keys[GLFW_KEY_X] && !this->KeysProcessed[GLFW_KEY_X])) {
-            Player->Texture = ResourceManager::GetTexture("character-shoot");
-            Player->Shoot();
-            this->KeysProcessed[GLFW_KEY_SPACE] = true;
-            this->KeysProcessed[GLFW_KEY_X] = true;
-        }
     }
 
     if (this->State == GAME_MENU) {

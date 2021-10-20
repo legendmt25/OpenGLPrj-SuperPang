@@ -28,8 +28,11 @@ public:
 
 class PowerArrowObject : public WeaponObject {
 public:
+	bool Stuck;
+
 	PowerArrowObject();
 	PowerArrowObject(GameObject& Player, glm::vec3 velocity);
 	PowerArrowObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f));
 	glm::vec3& Move(float dt, unsigned int windowWidth, unsigned int windowHeight);
+	void Reset();
 };

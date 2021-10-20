@@ -2,6 +2,7 @@
 
 #include "Sprite3DRenderer.h"
 #include "BallObject.h"
+#include "PowerUpObject.h"
 
 class Data {
 public:

@@ -17,9 +17,16 @@ void PlayerObject::Reset(glm::vec3 position, glm::vec3 velocity) {
     this->Velocity = velocity;
 }
 
+void PlayerObject::ResetWeapons() {
+    for (auto& Weapon : this->Weapons) {
+        Weapon->Reset();
+    }
+}
+
 void PlayerObject::Shoot() {
     for (auto& Weapon : this->Weapons) {
         if (!Weapon->Using) {
+            Weapon->Reset();
             Weapon->UseWeapon();
             break;
         }

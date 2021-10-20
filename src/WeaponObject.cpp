@@ -20,6 +20,7 @@ void WeaponObject::UseWeapon() {
 void WeaponObject::Reset() {
 	this->Position = glm::vec3(Player->Position.x, Player->Position.y + Player->Size.y / 2.0f, 0.0f);
 	this->Size = glm::vec3(20.0f, 20.0f, 1.0f);
+	Using = false;
 }
 
 ArrowObject::ArrowObject()
@@ -45,31 +46,41 @@ glm::vec3& ArrowObject::Move(float dt, unsigned int windowWidth, unsigned int wi
 }
 
 PowerArrowObject::PowerArrowObject()
-	: WeaponObject() {}
+	: WeaponObject(), Stuck(false) {}
 
 PowerArrowObject::PowerArrowObject(GameObject& Player, glm::vec3 velocity)
-	: WeaponObject(Player, ResourceManager::GetTexture("arrow"), velocity) {}
+	: WeaponObject(Player, ResourceManager::GetTexture("arrow"), velocity), Stuck(false) {}
 
 PowerArrowObject::PowerArrowObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	: WeaponObject(position, size, texture, color, velocity) {}
+	: WeaponObject(position, size, texture, color, velocity), Stuck(false) {}
 
 float framesC1 = 0.0f;
 
 glm::vec3& PowerArrowObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
-	if (Using) {
-		if (this->Position.y > this->Size.y / 2.0f) {
+	
+	if (this->Using && !this->Stuck) {
+		if (this->Position.y > this->Size.y / 2.0f && this->Using) {
 			this->Position.y -= this->Velocity.y * dt;
 			this->Size.y += 2 * this->Velocity.y * dt;
 		}
 		else {
-			if (framesC1 < 2.0f) {
-				framesC1 += dt;
-			}
-			else {
-				this->Using = false;
-				framesC1 = 0;
-			}
+			this->Stuck = true;
+		}
+	}
+	if (this->Stuck) {
+		if (framesC1 < 2.0f) {
+			framesC1 += dt;
+		}
+		else {
+			this->Using = false;
+			this->Stuck = false;
+			framesC1 = 0;
 		}
 	}
 	return this->Position;
+}
+
+void PowerArrowObject::Reset() {
+	WeaponObject::Reset();
+	this->Stuck = false;
 }

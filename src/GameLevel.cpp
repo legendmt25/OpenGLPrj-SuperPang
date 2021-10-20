@@ -77,10 +77,10 @@ void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned 
 			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
 		}
 		if (data.type == "BLOCK") {
-			GameObject* obj = new GameObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(0.0f), glm::vec3(0.0f));
+			GameObject* obj = new PowerUpObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(1.0f), glm::vec3(0.0f));
 			if (data.solid) {
 				obj->IsSolid = true;
-				obj->Texture = ResourceManager::GetTexture("block-solid");
+				//obj->Texture = ResourceManager::GetTexture("block-solid");
 			}
 			this->Objects.push_back(obj);
 		}

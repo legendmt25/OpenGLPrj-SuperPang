@@ -15,4 +15,5 @@ public:
 	void Reset(glm::vec3 position, glm::vec3 velocity);
 	void ProcessInput(float dt, unsigned int window_width, unsigned int window_height);
 	void Shoot();
+	void ResetWeapons();
 };

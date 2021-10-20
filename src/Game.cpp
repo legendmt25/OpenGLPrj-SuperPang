@@ -14,6 +14,7 @@
 #include "SpriteRenderer.h"
 #include "Sprite3DRenderer.h"
 #include "BallObject.h"
+#include "PowerUpObject.h"
 #include "PlayerObject.h"
 #include "TextRenderer.h"
 #include "irrKlang.h"
@@ -117,6 +118,8 @@ void Game::Update(float dt)
                 this->State = GAME_WIN;
             }
             else {
+                Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
+                Player->ResetWeapons();
                 ++this->Level;
             }
             currentLevel.Reset();
@@ -194,7 +197,6 @@ void Game::ProcessInput(float dt)
 
 void Game::Render()
 {
-
     if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
         Renderer3D->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec3(this->Width / 2.0f, this->Height / 2.0f, 0.0f), glm::vec3(this->Width, this->Height, 1.0f), 0.0f, glm::vec3(1.0f));
         
@@ -228,25 +230,73 @@ void Game::Render()
 
 void Game::DoCollisions() {
     for (auto& object : this->Levels[this->Level]->Objects) {
-        if (!object->Destroyed && dynamic_cast<BallObject*>(object) != nullptr) {
-            Collision& collisionPlayer = object->checkCollision(*Player);
-            if (collisionPlayer.collision) {
+        if (object->Destroyed)
+            continue;
+        //COLLISIONS WITH BALLS AND OTHER OBJECTS
+        for (auto& obj : this->Levels[this->Level]->Objects) {
+            if (obj->Destroyed)
+                continue;
+            BallObject* Ball = dynamic_cast<BallObject*>(object);
+            PowerUpObject* Obj = dynamic_cast<PowerUpObject*>(obj);
+            if (Ball == nullptr)
+                break;
+            if (Obj == nullptr)
+                continue;
+
+            Collision& collisionBallObj = Ball->checkCollision(*Obj);
+            if (collisionBallObj.collision) {
+                if (collisionBallObj.direction == LEFT || collisionBallObj.direction == RIGHT)
+                {
+                    Ball->Velocity.x = -Ball->Velocity.x;
+                    float penetration = Ball->Radius - std::abs(collisionBallObj.difference.x);
+                    if (collisionBallObj.direction == LEFT)
+                        Ball->Position.x += penetration;
+                    else
+                        Ball->Position.x -= penetration;
+                }
+                else {
+                    Ball->Velocity.y = -Ball->Velocity.y;
+                    float penetration = Ball->Radius - std::abs(collisionBallObj.difference.y);
+                    if (collisionBallObj.direction == UP)
+                        Ball->Position.y -= penetration;
+                    else
+                        Ball->Position.y += penetration;
+                }
+            }
+        }
+
+        //COLLISIONS WITH PLAYER
+        Collision& collisionPlayer = object->checkCollision(*Player);
+        if (collisionPlayer.collision) {
+            if (dynamic_cast<BallObject*>(object) != nullptr) {
                 --this->Lives;
                 SoundEngine->stopAllSounds();
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 this->Levels[Level]->Reset();
                 Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f));
+                Player->ResetWeapons();
                 SoundEngine->play2D("../audio/breakout.mp3", true);
             }
+            else {
+                //TODO: keep the player on the block
+            }
+        }
 
-            for (auto& Weapon : Player->Weapons) {
+        //COLLISION WITH WEAPONS
+        for (auto& Weapon : Player->Weapons) {
+            if (Weapon->Using) {
                 Collision& collisionWeapon = object->checkCollision(*Weapon);
-                if (Weapon->Using && collisionWeapon.collision) {
-                    if (dynamic_cast<BallObject*>(object) != nullptr) {
+                if (collisionWeapon.collision) {
+                    if (!object->IsSolid) {
                         object->Destroyed = true;
+                        Weapon->Using = false;
                     }
-                    Weapon->Using = false;
-                    Weapon->Reset();
+                    else if (dynamic_cast<PowerArrowObject*>(Weapon) != nullptr) {
+                        dynamic_cast<PowerArrowObject*>(Weapon)->Stuck = true;
+                    }
+                    else {
+                        Weapon->Using = false;
+                    }
                 }
             }
         }

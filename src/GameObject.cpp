@@ -18,12 +18,7 @@ Collision GameObject::checkCollision(GameObject& obj) {
                       obj.Position.y + obj.Size.y / 2.0f >= this->Position.y - this->Size.y / 2.0f;
     bool collision = collisionX && collisionY;
 
-    if (collision) {
-        return Collision(true);
-    }
-    else {
-        return Collision(false);
-    }
+    return Collision(collision);
 }
 
 glm::vec3& GameObject::Move(float dt, unsigned int window_width, unsigned int window_height) {

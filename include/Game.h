@@ -20,7 +20,6 @@ enum GameState {
 class Game
 {
 public:
-    // game state
     GameMenu Menu;
     GameState State;	
     static bool Keys[1024];

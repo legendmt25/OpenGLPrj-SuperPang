@@ -3,6 +3,7 @@
 #include "Sprite3DRenderer.h"
 #include "BallObject.h"
 #include "PowerUpObject.h"
+#include "BlockObject.h"
 
 class Data {
 public:
@@ -19,6 +20,7 @@ class GameLevel
 public:
 	char* file;
 	std::vector<GameObject*> Objects;
+	std::vector<PowerUpObject*> PowerUps;
 
 	GameLevel(const char* file);
 	~GameLevel();

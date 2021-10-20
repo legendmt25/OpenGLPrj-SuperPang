@@ -24,3 +24,4 @@ public:
 	virtual void ProcessInput(float dt, unsigned int window_width, unsigned int window_height);
 	virtual void Reset();
 };
+

@@ -17,6 +17,12 @@ GameLevel::~GameLevel() {
 	for (auto& object : this->Objects) {
 		delete object;
 	}
+
+	for (auto& object : this->PowerUps) {
+		delete object;
+	}
+	this->Objects.clear();
+	this->Objects.clear();
 }
 
 unsigned int ww, wh;
@@ -42,7 +48,6 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 			std::string type;
 			glm::vec3 position;
 			glm::vec3 size;
-			bool solid;
 
 			sstream >> type;
 			sstream >> position.x;
@@ -62,8 +67,7 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 			position.z = 0.0f;
 			size.z = 1.0f;
 
-			sstream >> solid;
-			vData.push_back(Data(type, position, size, solid));
+			vData.push_back(Data(type, position, size, false));
 		}
 		if(vData.size() > 0) {
 			Init(vData, width, height);
@@ -77,19 +81,18 @@ void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned 
 			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
 		}
 		if (data.type == "BLOCK") {
-			GameObject* obj = new PowerUpObject(data.pos, data.size, ResourceManager::GetTexture("block"), glm::vec3(1.0f), glm::vec3(0.0f));
-			if (data.solid) {
-				obj->IsSolid = true;
-				//obj->Texture = ResourceManager::GetTexture("block-solid");
-			}
-			this->Objects.push_back(obj);
+			this->Objects.push_back(new BlockObject(data.pos, data.size, ResourceManager::GetTexture("-block-solid"), glm::vec3(1.0f), glm::vec3(0.0f)));
+			this->Objects[this->Objects.size() - 1]->IsSolid = true;
+		}
+		if (data.type == "BLOCKPOWERUP") {
+			this->Objects.push_back(new BlockObject(data.pos, data.size, ResourceManager::GetTexture("-block"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f)));
 		}
 	}
 }
 
 bool GameLevel::isCompleted() {
 	for (auto& object : this->Objects) {
-		if (!object->IsSolid && !object->Destroyed) {
+		if (dynamic_cast<BallObject*>(object) != nullptr && !object->IsSolid && !object->Destroyed) {
 			return false;
 		}
 	}
@@ -102,11 +105,22 @@ void GameLevel::Draw(Sprite3DRenderer& Renderer3D) {
 			object->Draw(Renderer3D);
 		}
 	}
+
+	for (auto& object : this->PowerUps) {
+		if (!object->Destroyed) {
+			object->Draw(Renderer3D);
+		}
+	}
 }
 
 void GameLevel::Reset() {
 	for (auto& object : this->Objects) {
 		delete object;
 	}
+	for (auto& object : this->PowerUps) {
+		delete object;
+	}
+	this->Objects.clear();
+	this->PowerUps.clear();
 	this->Load(ww, wh);
 }

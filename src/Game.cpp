@@ -28,6 +28,7 @@ irrklang::ISoundEngine* SoundEngine = nullptr;
 const unsigned int lives = 5;
 bool Game::Keys[1024] = { 0 };
 bool Game::KeysProcessed[1024] = { 0 };
+std::vector<std::string> powerups;
 
 Game::Game(unsigned int width, unsigned int height) 
     : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0) {}
@@ -49,11 +50,17 @@ void Game::LoadFiles() {
     ResourceManager::LoadShader("../shaders/sprite.vs", "../shaders/sprite.fs", NULL, "sprite");
     ResourceManager::LoadShader("../shaders/text.vs", "../shaders/text.fs", NULL, "text");
     ResourceManager::LoadShader("../shaders/sprite3D.vs", "../shaders/sprite3D.fs", NULL, "sprite3D");
-    std::vector<std::string> texturesDirectories = { "../textures/", "../levels/backgrounds/" };
+    std::vector<std::string> texturesDirectories = { "../textures/", "../levels/backgrounds/", "../textures/powerups/" };
     //load textures
     for (auto& dir : texturesDirectories) {
         for (auto& file : std::experimental::filesystem::directory_iterator(dir)) {
-            ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 , file.path().filename().replace_extension().string());
+            if (file.path().extension().string() == "") {
+                continue;
+            }
+            if (file.path().string().find("powerups") != -1) {
+                powerups.push_back(file.path().filename().replace_extension().string());
+            }
+            ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 && file.path().filename().string()[0] != '-', file.path().filename().replace_extension().string());
         }
     }
 
@@ -73,6 +80,7 @@ void Game::LoadFiles() {
 void Game::Init()
 {
     this->LoadFiles();
+
     ResourceManager::GetShader("sprite").SetInteger("image", 0, true);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, -1.0f, 1.0f));
 
@@ -123,6 +131,19 @@ void Game::Update(float dt)
                 ++this->Level;
             }
             currentLevel.Reset();
+        }
+
+
+        for (int i = 0; i < this->Levels[this->Level]->PowerUps.size();) {
+            auto& el = this->Levels[this->Level]->PowerUps[i];
+            if (el->Destroyed) {
+                delete el;
+                this->Levels[this->Level]->PowerUps.erase(this->Levels[this->Level]->PowerUps.begin() + i, this->Levels[this->Level]->PowerUps.begin() + i + 1);
+            }
+            else {
+                el->Move(dt, this->Width, this->Height);
+                ++i;
+            }
         }
 
         for (auto& Weapon : Player->Weapons) {
@@ -205,7 +226,7 @@ void Game::Render()
                 Weapon->Draw(*Renderer3D);
             }
         }
-        
+
         Player->Draw(*Renderer3D);
         this->Levels[this->Level]->Draw(*Renderer3D);
         Text->RenderText("Lives:" + std::to_string(this->Lives), 5.0f, this->Height - 20.0f, 1.0f);
@@ -229,18 +250,91 @@ void Game::Render()
 }
 
 void Game::DoCollisions() {
-    for (auto& object : this->Levels[this->Level]->Objects) {
-        if (object->Destroyed)
+
+    //COLLISION WITH POWERUPS AND WEAPONS
+    for (auto& object : this->Levels[this->Level]->PowerUps) {
+        for (auto& Weapon : Player->Weapons) {
+            if (Weapon->Using) {
+                Collision WeaponPowerUpCollision = object->checkCollision(*Weapon);
+                if (WeaponPowerUpCollision.collision) {
+                    object->Destroyed = true;
+                    object->Activate(Player);
+                    Weapon->Using = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    //COLLISION WITH POWERUPS AND PLAYER
+    for (auto& object : this->Levels[this->Level]->PowerUps) {
+        Collision PlayerPowerUpCollision = object->checkCollision(*Player);
+        if (PlayerPowerUpCollision.collision) {
+            object->Destroyed = true;
+            object->Activate(Player);
+        }
+    }
+
+    //COLLISION WITH WEAPONS
+    for (int i = 0; i < this->Levels[this->Level]->Objects.size(); ++i) {
+        auto& object = this->Levels[this->Level]->Objects[i];
+        if (object->Destroyed) {
             continue;
-        //COLLISIONS WITH BALLS AND OTHER OBJECTS
-        for (auto& obj : this->Levels[this->Level]->Objects) {
-            if (obj->Destroyed)
+        }
+        for (auto& Weapon : Player->Weapons) {
+            if (!Weapon->Using) {
                 continue;
-            BallObject* Ball = dynamic_cast<BallObject*>(object);
-            PowerUpObject* Obj = dynamic_cast<PowerUpObject*>(obj);
-            if (Ball == nullptr)
-                break;
-            if (Obj == nullptr)
+            }
+
+            Collision& collisionWeapon = object->checkCollision(*Weapon);
+            if (collisionWeapon.collision) {
+                if (!object->IsSolid) {
+                    object->Destroyed = true;
+                    Weapon->Using = false;
+                    //generatePowerUp
+                    unsigned int r = rand() % 100;
+                    if (r >= 20 && r <= 30) {
+                        unsigned int randomPowerUp = rand() % powerups.size();
+                        this->Levels[this->Level]->PowerUps.push_back(new PowerUpObject(*object, ResourceManager::GetTexture(powerups[randomPowerUp]), powerups[randomPowerUp]));
+                    }
+
+                    //Create new balls half the size of the collision ball
+                    if (dynamic_cast<BallObject*>(object) != nullptr && object->Size.x / 4.0f > 10.0f) {
+                        glm::vec3 Position = object->Position;
+                        float radius = object->Size.x / 4.0f;
+                        BallObject* a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f));
+                        BallObject* b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f));
+                        a->Velocity = -a->Velocity;
+                        b->Velocity.y = -b->Velocity.y;
+
+                        this->Levels[this->Level]->Objects.push_back(a);
+                        this->Levels[this->Level]->Objects.push_back(b);
+                        break;
+                    }
+                }
+                
+                if (dynamic_cast<PowerArrowObject*>(Weapon) != nullptr) {
+                    dynamic_cast<PowerArrowObject*>(Weapon)->Stuck = true;
+                }
+                else {
+                    Weapon->Using = false;
+                }
+            }
+        }
+    }
+
+
+
+    //COLLISION BALLS WITH OTHER OBJECTS IN LEVEL
+    for (auto& object : this->Levels[this->Level]->Objects) {
+        BallObject* Ball = dynamic_cast<BallObject*>(object);
+        if (object->Destroyed || Ball == nullptr) {
+            continue;
+        }
+        
+        for (auto& obj : this->Levels[this->Level]->Objects) {
+            BlockObject* Obj = dynamic_cast<BlockObject*>(obj);
+            if (obj->Destroyed || Obj == nullptr)
                 continue;
 
             Collision& collisionBallObj = Ball->checkCollision(*Obj);
@@ -264,10 +358,16 @@ void Game::DoCollisions() {
                 }
             }
         }
+    }
 
-        //COLLISIONS WITH PLAYER
-        Collision& collisionPlayer = object->checkCollision(*Player);
-        if (collisionPlayer.collision) {
+    //PLAYER BALL COLLISIONS
+    for (int i = 0; i < this->Levels[this->Level]->Objects.size(); ++i) {
+        auto& object = this->Levels[this->Level]->Objects[i];
+        if (object->Destroyed) {
+            continue;
+        }
+        Collision& collisionBallPlayer = object->checkCollision(*Player);
+        if (collisionBallPlayer.collision) {
             if (dynamic_cast<BallObject*>(object) != nullptr) {
                 --this->Lives;
                 SoundEngine->stopAllSounds();
@@ -281,26 +381,9 @@ void Game::DoCollisions() {
                 //TODO: keep the player on the block
             }
         }
-
-        //COLLISION WITH WEAPONS
-        for (auto& Weapon : Player->Weapons) {
-            if (Weapon->Using) {
-                Collision& collisionWeapon = object->checkCollision(*Weapon);
-                if (collisionWeapon.collision) {
-                    if (!object->IsSolid) {
-                        object->Destroyed = true;
-                        Weapon->Using = false;
-                    }
-                    else if (dynamic_cast<PowerArrowObject*>(Weapon) != nullptr) {
-                        dynamic_cast<PowerArrowObject*>(Weapon)->Stuck = true;
-                    }
-                    else {
-                        Weapon->Using = false;
-                    }
-                }
-            }
-        }
     }
+
+
 }
 
 void Game::Reset() {

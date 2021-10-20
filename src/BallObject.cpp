@@ -1,14 +1,15 @@
 #include "BallObject.h"
+#include "ResourceManager.h"
 
 BallObject::BallObject(glm::vec3 position, float radius, Texture2D texture, glm::vec3 color, glm::vec3 velocity, glm::vec3 gravity)
-	:GameObject(position, glm::vec3(2.0f * radius, 2.0f * radius, 1.0f), texture, color, velocity), Radius(radius), Gravity(gravity)
+	:GameObject(position, glm::vec3(2.0f * radius, 2.0f * radius, 1.0f), texture, color, velocity), Radius(radius), Gravity(gravity), pop(false)
 {
 	this->Position.x += radius;
 	this->Position.y += radius;
 }
 
 BallObject::BallObject()
-	:GameObject(), Radius(12.5f) {}
+	:GameObject(), Radius(12.5f), Gravity(0.0f, 1.4f, 0.0f), pop(false) {}
 
 
 float clamp(float value, float minn, float maxx) {
@@ -33,6 +34,27 @@ Collision BallObject::checkCollision(GameObject& obj) {
 	}
 	else {
 		return Collision();
+	}
+}
+
+float framePop = 0.0f;
+unsigned int PopTexture = 1;
+
+void BallObject::Pop(float dt) {
+	if (this->pop) {
+		if (framePop >= 0.01f) {
+			this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTexture));
+			framePop = 0.0f;
+			++PopTexture;
+		}
+		else {
+			framePop += dt;
+		}
+		if (PopTexture >= 5) {
+			this->Destroyed = true;
+			framePop = 0.0f;
+			PopTexture = 1;
+		}
 	}
 }
 

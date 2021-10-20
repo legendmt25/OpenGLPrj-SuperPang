@@ -2,22 +2,19 @@
 #include "ResourceManager.h"
 
 WeaponObject::WeaponObject()
-	: GameObject(), Using(false), Player(nullptr) {}
+	: GameObject(), Using(false) {}
 
 WeaponObject::WeaponObject(GameObject& Player, Texture2D texture, glm::vec3 velocity)
-	: WeaponObject(glm::vec3(Player.Position.x, Player.Position.y, 0.0f), glm::vec3(20.0f, 20.0f, 1.0f), texture, glm::vec3(1.0f), velocity)
-{
-	this->Player = &Player;
-}
+	: WeaponObject(glm::vec3(Player.Position.x, Player.Position.y, 0.0f), glm::vec3(20.0f, 20.0f, 1.0f), texture, glm::vec3(1.0f), velocity) {}
 
 WeaponObject::WeaponObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	: GameObject(position, size, texture, color, velocity), Using(false), Player(nullptr) {}
+	: GameObject(position, size, texture, color, velocity), Using(false) {}
 
 void WeaponObject::UseWeapon() {
 	this->Using = true;
 }
 
-void WeaponObject::Reset() {
+void WeaponObject::Reset(GameObject* Player) {
 	this->Position = glm::vec3(Player->Position.x, Player->Position.y + Player->Size.y / 2.0f, 0.0f);
 	this->Size = glm::vec3(20.0f, 20.0f, 1.0f);
 	Using = false;
@@ -80,7 +77,7 @@ glm::vec3& PowerArrowObject::Move(float dt, unsigned int windowWidth, unsigned i
 	return this->Position;
 }
 
-void PowerArrowObject::Reset() {
-	WeaponObject::Reset();
+void PowerArrowObject::Reset(GameObject* Player) {
+	WeaponObject::Reset(Player);
 	this->Stuck = false;
 }

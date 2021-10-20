@@ -5,7 +5,6 @@
 
 class WeaponObject: public GameObject
 {
-	GameObject* Player;
 public:
 	bool Using;
 
@@ -14,7 +13,7 @@ public:
 	WeaponObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f));
 	void UseWeapon();
 	virtual glm::vec3& Move(float dt, unsigned int windowWidth, unsigned int windowHeight) = 0;
-	void Reset();
+	virtual void Reset(GameObject* Player);
 };
 
 class ArrowObject: public WeaponObject 
@@ -34,5 +33,5 @@ public:
 	PowerArrowObject(GameObject& Player, glm::vec3 velocity);
 	PowerArrowObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f));
 	glm::vec3& Move(float dt, unsigned int windowWidth, unsigned int windowHeight);
-	void Reset();
+	void Reset(GameObject* Player);
 };

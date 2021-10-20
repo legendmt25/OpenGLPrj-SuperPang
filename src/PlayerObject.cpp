@@ -9,24 +9,37 @@ PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture
     : GameObject(position, size, texture, color, velocity)
 {
     this->Weapons.push_back(new ArrowObject(*this, glm::vec3(500.0f)));
-    this->Weapons.push_back(new PowerArrowObject(*this, glm::vec3(500.0f)));
 }
 
 void PlayerObject::Reset(glm::vec3 position, glm::vec3 velocity) {
+    for (auto& Weapon : this->Weapons) {
+        delete Weapon;
+    }
+    this->Weapons.clear();
+    
     this->Position = position;
     this->Velocity = velocity;
+    this->Weapons.push_back(new ArrowObject(*this, glm::vec3(500.0f)));
 }
 
 void PlayerObject::ResetWeapons() {
     for (auto& Weapon : this->Weapons) {
-        Weapon->Reset();
+        Weapon->Reset(this);
     }
+}
+
+glm::vec3& PlayerObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight)
+{
+    if (this->Position.y < windowHeight - this->Size.y / 2.0f) {
+        this->Position.y += this->Velocity.y * dt;
+    }
+    return this->Position;
 }
 
 void PlayerObject::Shoot() {
     for (auto& Weapon : this->Weapons) {
         if (!Weapon->Using) {
-            Weapon->Reset();
+            Weapon->Reset(this);
             Weapon->UseWeapon();
             break;
         }
@@ -35,6 +48,7 @@ void PlayerObject::Shoot() {
 
 float frames = 0;
 int PlayerTexture = 1;
+float frameShoot = 0;
 
 void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned int window_height) {
     std::string direction = "";
@@ -68,6 +82,10 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
         this->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
     }
 
+    if (Game::Keys[GLFW_KEY_SPACE] || Game::Keys[GLFW_KEY_X]) {
+        this->Texture = ResourceManager::GetTexture("character-shoot");
+    }
+
     if ((Game::Keys[GLFW_KEY_SPACE] && !Game::KeysProcessed[GLFW_KEY_SPACE]) || (Game::Keys[GLFW_KEY_X] && !Game::KeysProcessed[GLFW_KEY_X])) {
         this->Texture = ResourceManager::GetTexture("character-shoot");
         this->Shoot();
@@ -80,5 +98,6 @@ PlayerObject::~PlayerObject() {
     for (auto& Weapon : this->Weapons) {
         delete Weapon;
     }
+    Weapons.clear();
 }
 

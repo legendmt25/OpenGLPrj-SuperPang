@@ -29,6 +29,8 @@ const unsigned int lives = 5;
 bool Game::Keys[1024] = { 0 };
 bool Game::KeysProcessed[1024] = { 0 };
 std::vector<std::string> powerups;
+bool PlayerCollision = false;
+
 
 Game::Game(unsigned int width, unsigned int height) 
     : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0) {}
@@ -115,10 +117,18 @@ void Game::Update(float dt)
 {
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
+            BallObject* Ball = dynamic_cast<BallObject*>(object);
+            if (Ball != nullptr && Ball->pop) {
+                Ball->Pop(dt);
+            }
             object->Move(dt, this->Width, this->Height);
         }
 
         this->DoCollisions();
+
+        if (!PlayerCollision) {
+            Player->Move(dt, this->Width, this->Height);
+        }
 
         GameLevel& currentLevel = *this->Levels[Level];
         if (currentLevel.isCompleted()) {
@@ -151,8 +161,7 @@ void Game::Update(float dt)
                 Weapon->Move(dt, this->Width, this->Height);
             }
             else {
-                Weapon->Using = false;
-                Weapon->Reset();
+                Weapon->Reset(Player);
             }
         }
 
@@ -258,8 +267,8 @@ void Game::DoCollisions() {
                 Collision WeaponPowerUpCollision = object->checkCollision(*Weapon);
                 if (WeaponPowerUpCollision.collision) {
                     object->Destroyed = true;
+                    Weapon->Reset(Player);
                     object->Activate(Player);
-                    Weapon->Using = false;
                     break;
                 }
             }
@@ -281,6 +290,7 @@ void Game::DoCollisions() {
         if (object->Destroyed) {
             continue;
         }
+        BallObject* Ball = dynamic_cast<BallObject*>(object);
         for (auto& Weapon : Player->Weapons) {
             if (!Weapon->Using) {
                 continue;
@@ -289,7 +299,6 @@ void Game::DoCollisions() {
             Collision& collisionWeapon = object->checkCollision(*Weapon);
             if (collisionWeapon.collision) {
                 if (!object->IsSolid) {
-                    object->Destroyed = true;
                     Weapon->Using = false;
                     //generatePowerUp
                     unsigned int r = rand() % 100;
@@ -299,7 +308,8 @@ void Game::DoCollisions() {
                     }
 
                     //Create new balls half the size of the collision ball
-                    if (dynamic_cast<BallObject*>(object) != nullptr && object->Size.x / 4.0f > 10.0f) {
+                    if (Ball != nullptr && object->Size.x / 4.0f > 10.0f) {
+                        Ball->pop = true;
                         glm::vec3 Position = object->Position;
                         float radius = object->Size.x / 4.0f;
                         BallObject* a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f));
@@ -310,6 +320,9 @@ void Game::DoCollisions() {
                         this->Levels[this->Level]->Objects.push_back(a);
                         this->Levels[this->Level]->Objects.push_back(b);
                         break;
+                    }
+                    else {
+                        object->Destroyed = true;
                     }
                 }
                 
@@ -377,9 +390,13 @@ void Game::DoCollisions() {
                 Player->ResetWeapons();
                 SoundEngine->play2D("../audio/breakout.mp3", true);
             }
-            else {
+            else if(dynamic_cast<BlockObject*>(object) != nullptr) {
                 //TODO: keep the player on the block
+                PlayerCollision = true;
             }
+        }
+        else {
+            PlayerCollision = false;
         }
     }
 
@@ -388,6 +405,7 @@ void Game::DoCollisions() {
 
 void Game::Reset() {
     Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
+    //Player->Reset(glm::vec3(480.0f, 0.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
     this->Level = 0;
     this->Levels[this->Level]->Reset();
     this->Lives = lives;

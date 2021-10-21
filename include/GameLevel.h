@@ -5,6 +5,8 @@
 #include "PowerUpObject.h"
 #include "BlockObject.h"
 #include "HexagonObject.h"
+#include "LadderObject.h"
+
 
 class Data {
 public:
@@ -21,6 +23,7 @@ class GameLevel
 public:
 	char* file;
 	std::vector<GameObject*> Objects;
+	std::vector<AttackerObject*> Attackers;
 	std::vector<PowerUpObject*> PowerUps;
 
 	GameLevel(const char* file);

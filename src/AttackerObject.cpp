@@ -15,14 +15,11 @@ AttackerObject::AttackerObject()
 	:GameObject(), Radius(12.5f), pop(false) {}
 
 
-float clamp(float value, float minn, float maxx) {
-	return max(minn, min(maxx, value));
-}
-
 Collision AttackerObject::checkCollision(GameObject& obj) {
 	glm::vec2 center(this->Position);
 	// calculate AABB info (center, half-extents)
 	glm::vec2 rectangle_half_extents(obj.Size.x / 2.0f, obj.Size.y / 2.0f);
+	//glm::vec2 rectangle_half_extents(0.0f);
 	glm::vec2 rectangle_center(obj.Position.x, obj.Position.y);
 
 	glm::vec2 difference = center - rectangle_center;

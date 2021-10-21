@@ -78,7 +78,7 @@ void GameLevel::Load(unsigned int windowWidth, unsigned int windowHeight) {
 void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned int levelHeight) {
 	for (auto& data : vData) {
 		if (data.type == "BALL") {
-			this->Objects.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
+			this->Attackers.push_back(new BallObject(data.pos, data.size.x / 2.0f, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
 		}
 		if (data.type == "BLOCK") {
 			this->Objects.push_back(new BlockObject(data.pos, data.size, ResourceManager::GetTexture("-block-solid"), glm::vec3(1.0f), glm::vec3(0.0f)));
@@ -88,14 +88,17 @@ void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned 
 			this->Objects.push_back(new BlockObject(data.pos, data.size, ResourceManager::GetTexture("-block"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f)));
 		}
 		if (data.type == "HEXAGON") {
-			this->Objects.push_back(new HexagonObject(data.pos, data.size, ResourceManager::GetTexture("hexagon-1"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
+			this->Attackers.push_back(new HexagonObject(data.pos, data.size, ResourceManager::GetTexture("hexagon-1"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
+		}
+		if (data.type == "LADDER") {
+			this->Objects.push_back(new LadderObject(data.pos, data.size));
 		}
 	}
 }
 
 bool GameLevel::isCompleted() {
-	for (auto& object : this->Objects) {
-		if (dynamic_cast<BallObject*>(object) != nullptr && !object->IsSolid && !object->Destroyed) {
+	for (auto& object : this->Attackers) {
+		if (!object->Destroyed && !object->IsSolid) {
 			return false;
 		}
 	}
@@ -103,6 +106,7 @@ bool GameLevel::isCompleted() {
 }
 
 void GameLevel::Draw(Sprite3DRenderer& Renderer3D) {
+
 	for (auto& object : this->Objects) {
 		if (!object->Destroyed) {
 			object->Draw(Renderer3D);
@@ -117,6 +121,9 @@ void GameLevel::Draw(Sprite3DRenderer& Renderer3D) {
 }
 
 void GameLevel::Reset() {
+	for (auto& object : this->Attackers) {
+		delete object;
+	}
 	for (auto& object : this->Objects) {
 		delete object;
 	}
@@ -125,5 +132,6 @@ void GameLevel::Reset() {
 	}
 	this->Objects.clear();
 	this->PowerUps.clear();
+	this->Attackers.clear();
 	this->Load(ww, wh);
 }

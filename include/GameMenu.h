@@ -18,6 +18,8 @@ public:
 
 
 	Option(std::string Value, glm::vec2 Position = glm::vec2(0.0f), float FontSize = 12.0f);
+	~Option();
+
 	void Draw(TextRenderer& Renderer);
 };
 
@@ -27,10 +29,12 @@ public:
 	std::string Path;
 	Option* Selected;
 
-	GameMenu(std::string path) : Selected(new Option("Press Enter", glm::vec2(0.0f))), Path(path) {}
+	GameMenu(std::string path);
+	~GameMenu();
+
 	void Load(unsigned int windowWidth, unsigned int windowHeight);
 	void Draw(TextRenderer& Renderer);
-	
 private:
 	void loadMenuFromFile(unsigned int windowWidth, unsigned int windowHeight, std::vector<Option*>& Options, Option* Parent);
+	void GameMenu::DestroyRecursive(std::vector<Option*>& Options);
 };

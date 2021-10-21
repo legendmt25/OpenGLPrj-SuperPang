@@ -46,6 +46,7 @@ Game::~Game()
     delete Player;
     delete Text;
     delete SoundEngine;
+    delete Menu;
 }
 
 void Game::LoadFiles() {

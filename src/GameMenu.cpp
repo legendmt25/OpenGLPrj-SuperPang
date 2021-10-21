@@ -15,9 +15,7 @@ void Option::Draw(TextRenderer& Renderer) {
 	}
 }
 
-void GameMenu::Draw(TextRenderer& Renderer) {
-	this->Selected->Draw(Renderer);
-}
+Option::~Option() = default;
 
 int countSpaces(std::string line) {
 	int spaces = 0;
@@ -25,6 +23,14 @@ int countSpaces(std::string line) {
 		++spaces;
 	}
 	return spaces;
+}
+
+
+GameMenu::GameMenu(std::string path) 
+	: Selected(new Option("Press Enter", glm::vec2(0.0f))), Path(path) {}
+
+void GameMenu::Draw(TextRenderer& Renderer) {
+	this->Selected->Draw(Renderer);
 }
 
 void GameMenu::loadMenuFromFile(unsigned int windowWidth, unsigned int windowHeight, std::vector<Option*>& Options, Option* Parent) {
@@ -60,4 +66,23 @@ void GameMenu::loadMenuFromFile(unsigned int windowWidth, unsigned int windowHei
 
 void GameMenu::Load(unsigned int windowWidth, unsigned int windowHeight) {
 	this->loadMenuFromFile(windowWidth, windowHeight, this->Selected->Options, this->Selected);
+}
+
+void GameMenu::DestroyRecursive(std::vector<Option*>& Options) {
+	for (auto& option : Options) {
+		if (option->Options.size() > 0) {
+			this->DestroyRecursive(option->Options);
+		}
+		option->Options.clear();
+		delete option;
+	}
+	Options.clear();
+}
+
+GameMenu::~GameMenu() {
+	while (this->Selected->ParentOption != nullptr) {
+		this->Selected = this->Selected->ParentOption;
+	}
+	this->DestroyRecursive(this->Selected->Options);
+	delete this->Selected;
 }

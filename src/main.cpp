@@ -14,11 +14,12 @@ const unsigned int SCREEN_WIDTH = 1280;
 const unsigned int SCREEN_HEIGHT = 720;
 bool fullScreen = false;
 
-Game SuperPang(SCREEN_WIDTH, SCREEN_HEIGHT);
+GLFWwindow* window = initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "SuperPang");
+Game SuperPang(window, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main(int argc, char* argv[])
 {
-    GLFWwindow* window = initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "SuperPang");
+    
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 

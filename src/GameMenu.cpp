@@ -1,12 +1,8 @@
 #include <GameMenu.h>
+#include <iostream>
 
 Option::Option(std::string Value, glm::vec2 Position, float FontSize, std::list<Option> Options)
 	:Value(Value), Position(Position), FontSize(FontSize), Selected(false) {}
-
-void Option::AlignCenter(unsigned int Width, unsigned int Height, float HeightOffset) {
-	float fontSize = 12.0f;
-	this->Position = glm::vec2((Width - Value.size() * fontSize) / 2.0f, Height / 2.0f + HeightOffset);
-}
 
 void Option::Draw(TextRenderer& Renderer) {
 	std::string h = "";
@@ -31,11 +27,23 @@ void GameMenu::Draw(TextRenderer& Renderer) {
 	}
 }
 
-void GameMenu::loadMenuFromFile(const char* gameMenuFile) {
+void GameMenu::loadMenuFromFile(const char* gameMenuFile, unsigned int windowWidth, unsigned int windowHeight) {
 	std::ifstream fileStream(gameMenuFile);
 	std::string line;
-	while (std::getline(fileStream, line)) {
-		std::stringstream stringStream(line);
+	float fontSize = 12.0f;
+	int offset = 0;
 
+	while (std::getline(fileStream, line)) {
+		if (line[0] != ' ') {
+			this->Options.push_back(Option(line, glm::vec2(windowWidth / 2.0f - line.size() * fontSize, windowHeight / 2.0f + offset)));
+			offset += 20;
+		}
+	}
+}
+
+void GameMenu::Load(const char* gameMenuFile, unsigned int windowWidth, unsigned int windowHeight) {
+	this->loadMenuFromFile(gameMenuFile, windowWidth, windowHeight);
+	if (this->Options.size() > 0) {
+		this->Options[0].Selected = true;
 	}
 }

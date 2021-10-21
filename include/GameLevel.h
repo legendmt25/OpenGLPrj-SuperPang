@@ -28,6 +28,7 @@ public:
 
 	GameLevel(const char* file);
 	~GameLevel();
+	
 	void Load(unsigned int windowWidth, unsigned int windowHeight);
 	void Draw(Sprite3DRenderer& renderer);
 	bool isCompleted();

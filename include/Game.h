@@ -19,6 +19,7 @@ enum GameState {
 
 class Game
 {
+    GLFWwindow* currentWindow;
 public:
     GameMenu Menu;
     GameState State;	
@@ -29,7 +30,7 @@ public:
     unsigned int Level;
     unsigned int Lives;
 
-    Game(unsigned int width, unsigned int height);
+    Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height);
     ~Game();
 
     // initialize game state (load all shaders/textures/levels)
@@ -41,6 +42,8 @@ public:
     void Render();
     void DoCollisions();
     void Reset();
+private:
+    void ShouldGeneratePowerUp(GameObject& object);
 };
 
 #endif

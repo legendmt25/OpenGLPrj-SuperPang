@@ -33,8 +33,8 @@ std::vector<std::string> powerups;
 bool PlayerLadderCollision = false;
 bool PlayerBlockCollision = false;
 
-Game::Game(unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0) {}
+Game::Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height) 
+    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(), currentWindow(currentWindow) {}
 
 Game::~Game()
 {
@@ -77,9 +77,7 @@ void Game::LoadFiles() {
         level->Load(this->Width, this->Height);
         this->Levels.push_back(level);
     }
-
-    std::ifstream gameMenuFile("game.menu");
-
+    this->Menu.Load("../game.menu", this->Width, this->Height);
 }
 
 
@@ -94,13 +92,6 @@ void Game::Init()
     ResourceManager::GetShader("sprite3D").SetInteger("image", 0, true);
     ResourceManager::GetShader("sprite3D").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, 0.0f, 1.0f));
     ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::mat4(1.0f));
-
-    //create game menu
-    Option option1("GAME START");
-    Option option2("SETTINGS");
-    option1.AlignCenter(this->Width, this->Height, -20.0f);
-    option2.AlignCenter(this->Width, this->Height, 0.0f);
-    this->Menu = GameMenu({ option1, option2 });
 
     //init Player
     glm::vec3 PlayerVelocity(500.0f);
@@ -206,12 +197,18 @@ void Game::ProcessInput(float dt)
     }
 
     if (this->State == GAME_MENU) {
-        if (this->Keys[GLFW_KEY_ENTER] && this->Menu.Selected == 0 && !this->KeysProcessed[GLFW_KEY_ENTER]) {
-            SoundEngine->stopAllSounds();
-            SoundEngine->play2D("../audio/stage1.mp3", true);
-            this->Reset();
-            this->State = GAME_ACTIVE;
-            this->KeysProcessed[GLFW_KEY_ENTER] = true;
+        if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
+            if (this->Menu.Selected == 0) {
+                SoundEngine->stopAllSounds();
+                SoundEngine->play2D("../audio/stage1.mp3", true);
+                this->Reset();
+                this->State = GAME_ACTIVE;
+                this->KeysProcessed[GLFW_KEY_ENTER] = true;
+            }
+            if (this->Menu.Selected == this->Menu.Options.size() - 1) {
+                glfwSetWindowShouldClose(this->currentWindow, true);
+                this->KeysProcessed[GLFW_KEY_ENTER] = true;
+            }
         }
         if (this->Keys[GLFW_KEY_S] && !this->KeysProcessed[GLFW_KEY_S]) {
             this->KeysProcessed[GLFW_KEY_S] = true;
@@ -321,18 +318,13 @@ void Game::DoCollisions() {
 
             Collision& collisionWeapon = object->checkCollision(*Weapon);
             if (collisionWeapon.collision && !object->IsSolid) {
+                SoundEngine->play2D("../audio/ball-pop.mp3");
                 object->pop = true;
                 Weapon->Using = false;
-                //generatePowerUp
-                unsigned int r = rand() % 100;
-                if (r >= 20 && r <= 30) {
-                    unsigned int randomPowerUp = rand() % powerups.size();
-                    this->Levels[this->Level]->PowerUps.push_back(new PowerUpObject(*object, ResourceManager::GetTexture(powerups[randomPowerUp]), powerups[randomPowerUp]));
-                }
+                
+                this->ShouldGeneratePowerUp(*object);
 
                 //Create new balls half the size of the collision ball
-
-                SoundEngine->play2D("../audio/ball-pop.mp3");
                 if (object && object->Size.x / 4.0f > 12.0f) {
                     object->pop = true;
                     glm::vec3 Position = object->Position;
@@ -383,6 +375,7 @@ void Game::DoCollisions() {
                 }
                 else {
                     object->Destroyed = true;
+                    this->ShouldGeneratePowerUp(*object);
                     Weapon->Reset(Player);
                 }
             }
@@ -463,4 +456,14 @@ void Game::Reset() {
     this->Level = 0;
     this->Levels[this->Level]->Reset();
     this->Lives = lives;
+}
+
+void Game::ShouldGeneratePowerUp(GameObject& object)
+{
+    //generatePowerUp
+    unsigned int r = rand() % 100;
+    if (r >= 20 && r <= 30) {
+        unsigned int randomPowerUp = rand() % powerups.size();
+        this->Levels[this->Level]->PowerUps.push_back(new PowerUpObject(object, ResourceManager::GetTexture(powerups[randomPowerUp]), powerups[randomPowerUp]));
+    }
 }

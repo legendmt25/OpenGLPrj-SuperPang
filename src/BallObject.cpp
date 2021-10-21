@@ -37,23 +37,23 @@ Collision BallObject::checkCollision(GameObject& obj) {
 	}
 }
 
-float framePop = 0.0f;
-unsigned int PopTexture = 1;
+float framePopBall = 0.0f;
+unsigned int PopTextureBall = 1;
 
 void BallObject::Pop(float dt) {
 	if (this->pop) {
-		if (framePop >= 0.01f) {
-			this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTexture));
-			framePop = 0.0f;
-			++PopTexture;
+		if (framePopBall >= 0.01f) {
+			this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureBall));
+			framePopBall = 0.0f;
+			++PopTextureBall;
 		}
 		else {
-			framePop += dt;
+			framePopBall += dt;
 		}
-		if (PopTexture >= 5) {
+		if (PopTextureBall >= 5) {
 			this->Destroyed = true;
-			framePop = 0.0f;
-			PopTexture = 1;
+			framePopBall = 0.0f;
+			PopTextureBall = 1;
 		}
 	}
 }

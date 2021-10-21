@@ -62,6 +62,7 @@ void Game::LoadFiles() {
             if (file.path().string().find("powerups") != -1) {
                 powerups.push_back(file.path().filename().replace_extension().string());
             }
+            std::cout << file.path().string() << std::endl;
             ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 && file.path().filename().string()[0] != '-', file.path().filename().replace_extension().string());
         }
     }
@@ -308,14 +309,24 @@ void Game::DoCollisions() {
                     }
 
                     //Create new balls half the size of the collision ball
-                    if (Ball != nullptr && object->Size.x / 4.0f > 10.0f) {
+                    if (Ball != nullptr && object->Size.x / 4.0f > 12.0f) {
                         Ball->pop = true;
                         glm::vec3 Position = object->Position;
                         float radius = object->Size.x / 4.0f;
-                        BallObject* a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f));
-                        BallObject* b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f));
-                        a->Velocity = -a->Velocity;
-                        b->Velocity.y = -b->Velocity.y;
+
+                        BallObject* a = nullptr;
+                        BallObject* b = nullptr;
+                        if(dynamic_cast<HexagonObject*>(Ball) != nullptr) {
+                            a = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            b = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            a->Velocity = -a->Velocity;
+                        }
+                        else {
+                            a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            a->Velocity = -a->Velocity;
+                            b->Velocity.y = -b->Velocity.y;
+                        }
 
                         this->Levels[this->Level]->Objects.push_back(a);
                         this->Levels[this->Level]->Objects.push_back(b);

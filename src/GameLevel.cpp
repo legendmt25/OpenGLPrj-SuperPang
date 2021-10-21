@@ -87,6 +87,9 @@ void GameLevel::Init(std::vector<Data> vData, unsigned int levelWidth, unsigned 
 		if (data.type == "BLOCKPOWERUP") {
 			this->Objects.push_back(new BlockObject(data.pos, data.size, ResourceManager::GetTexture("-block"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f)));
 		}
+		if (data.type == "HEXAGON") {
+			this->Objects.push_back(new HexagonObject(data.pos, data.size, ResourceManager::GetTexture("hexagon-1"), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(130.0f, 190.0f, 0.0f)));
+		}
 	}
 }
 

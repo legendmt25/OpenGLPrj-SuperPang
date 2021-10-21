@@ -4,6 +4,7 @@
 #include "BallObject.h"
 #include "PowerUpObject.h"
 #include "BlockObject.h"
+#include "HexagonObject.h"
 
 class Data {
 public:

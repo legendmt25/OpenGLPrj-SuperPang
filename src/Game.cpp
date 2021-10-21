@@ -34,7 +34,7 @@ bool PlayerLadderCollision = false;
 bool PlayerBlockCollision = false;
 
 Game::Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(new GameMenu("../game.menu")), currentWindow(currentWindow) {}
+    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(new GameMenu("../resources/game.menu")), currentWindow(currentWindow) {}
 
 Game::~Game()
 {
@@ -51,10 +51,10 @@ Game::~Game()
 
 void Game::LoadFiles() {
     //load shaders
-    ResourceManager::LoadShader("../shaders/sprite.vs", "../shaders/sprite.fs", NULL, "sprite");
-    ResourceManager::LoadShader("../shaders/text.vs", "../shaders/text.fs", NULL, "text");
-    ResourceManager::LoadShader("../shaders/sprite3D.vs", "../shaders/sprite3D.fs", NULL, "sprite3D");
-    std::vector<std::string> texturesDirectories = { "../textures/", "../levels/backgrounds/", "../textures/powerups/" };
+    ResourceManager::LoadShader("../resources/shaders/sprite.vs", "../resources/shaders/sprite.fs", NULL, "sprite");
+    ResourceManager::LoadShader("../resources/shaders/text.vs", "../resources/shaders/text.fs", NULL, "text");
+    ResourceManager::LoadShader("../resources/shaders/sprite3D.vs", "../resources/shaders/sprite3D.fs", NULL, "sprite3D");
+    std::vector<std::string> texturesDirectories = { "../resources/textures/", "../resources/levels/backgrounds/", "../resources/textures/powerups/" };
     //load textures
     for (auto& dir : texturesDirectories) {
         for (auto& file : std::experimental::filesystem::directory_iterator(dir)) {
@@ -70,7 +70,7 @@ void Game::LoadFiles() {
     }
 
     //load levels
-    for (auto& file : std::experimental::filesystem::directory_iterator("../levels/")) {
+    for (auto& file : std::experimental::filesystem::directory_iterator("../resources/levels/")) {
         if (file.path().string().find("background") != -1) {
             continue;
         }
@@ -106,8 +106,8 @@ void Game::Init()
     Text = new TextRenderer(this->Width, this->Height);
     SoundEngine = irrklang::createIrrKlangDevice();
 
-    Text->Load("../fonts/OCRAEXT.TTF", 24);
-    SoundEngine->play2D("../audio/mode-select.mp3", true);
+    Text->Load("../resources/fonts/OCRAEXT.TTF", 24);
+    SoundEngine->play2D("../resources/audio/mode-select.mp3", true);
 }
 
 void Game::Update(float dt)
@@ -135,12 +135,12 @@ void Game::Update(float dt)
             if (this->Level == this->Levels.size() - 1) {
                 this->State = GAME_WIN;
                 SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../audio/congratulations.mp3");
+                SoundEngine->play2D("../resources/audio/congratulations.mp3");
                 std::this_thread::sleep_for(std::chrono::seconds(6));
             }
             else {
                 SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../audio/stage-clear.mp3");
+                SoundEngine->play2D("../resources/audio/stage-clear.mp3");
                 std::this_thread::sleep_for(std::chrono::seconds(4));
                 Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
                 Player->ResetWeapons();
@@ -215,7 +215,7 @@ void Game::ProcessInput(float dt)
             auto& val = this->Menu->Selected->Options[this->Menu->Selected->Selected]->Value;
             if (val == "GAME START") {
                 SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../audio/stage1.mp3", true);
+                SoundEngine->play2D("../resources/audio/stage1.mp3", true);
                 this->State = GAME_ACTIVE;
                 this->Reset();
             }
@@ -328,7 +328,7 @@ void Game::DoCollisions() {
 
             Collision& collisionWeapon = object->checkCollision(*Weapon);
             if (collisionWeapon.collision && !object->IsSolid) {
-                SoundEngine->play2D("../audio/ball-pop.mp3");
+                SoundEngine->play2D("../resources/audio/ball-pop.mp3");
                 object->pop = true;
                 Weapon->Using = false;
                 
@@ -439,7 +439,7 @@ void Game::DoCollisions() {
             this->Levels[Level]->Reset();
             Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f));
             Player->ResetWeapons();
-            SoundEngine->play2D("../audio/stage1.mp3", true);
+            SoundEngine->play2D("../resources/audio/stage1.mp3", true);
         }
     }
 

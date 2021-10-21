@@ -2,40 +2,10 @@
 #include "ResourceManager.h"
 
 BallObject::BallObject(glm::vec3 position, float radius, Texture2D texture, glm::vec3 color, glm::vec3 velocity, glm::vec3 gravity)
-	:GameObject(position, glm::vec3(2.0f * radius, 2.0f * radius, 1.0f), texture, color, velocity), Radius(radius), Gravity(gravity), pop(false)
-{
-	this->Position.x += radius;
-	this->Position.y += radius;
-}
+	:AttackerObject(position, radius, texture, color, velocity), Gravity(gravity) {}
 
 BallObject::BallObject()
-	:GameObject(), Radius(12.5f), Gravity(0.0f, 1.4f, 0.0f), pop(false) {}
-
-
-float clamp(float value, float minn, float maxx) {
-	return max(minn, min(maxx, value));
-}
-
-Collision BallObject::checkCollision(GameObject& obj) {
-	glm::vec2 center(this->Position);
-	// calculate AABB info (center, half-extents)
-	glm::vec2 rectangle_half_extents(obj.Size.x / 2.0f, obj.Size.y / 2.0f);
-	glm::vec2 rectangle_center(obj.Position.x, obj.Position.y);
-
-	glm::vec2 difference = center - rectangle_center;
-	glm::vec2 clamped = glm::clamp(difference, -rectangle_half_extents, rectangle_half_extents);
-	// add clamped value to AABB_center and we get the value of box closest to circle
-	glm::vec2 closest = rectangle_center + clamped;
-		
-	difference = closest - center;
-
-	if (glm::length(difference) <= this->Radius) {
-		return Collision(true, VectorDirection(difference), difference);
-	}
-	else {
-		return Collision();
-	}
-}
+	:AttackerObject(), Gravity(0.0f, 1.4f, 0.0f) {}
 
 float framePopBall = 0.0f;
 unsigned int PopTextureBall = 1;

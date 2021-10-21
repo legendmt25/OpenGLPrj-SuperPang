@@ -1,8 +1,7 @@
 #pragma once
-#include "GameObject.h"
-#include "BallObject.h"
+#include "AttackerObject.h"
 
-class HexagonObject : public BallObject
+class HexagonObject : public AttackerObject
 {
 public:
 	HexagonObject();

@@ -31,7 +31,6 @@ bool Game::KeysProcessed[1024] = { 0 };
 std::vector<std::string> powerups;
 bool PlayerCollision = false;
 
-
 Game::Game(unsigned int width, unsigned int height) 
     : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0) {}
 
@@ -62,7 +61,7 @@ void Game::LoadFiles() {
             if (file.path().string().find("powerups") != -1) {
                 powerups.push_back(file.path().filename().replace_extension().string());
             }
-            std::cout << file.path().string() << std::endl;
+            //std::cout << file.path().string() << std::endl;
             ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 && file.path().filename().string()[0] != '-', file.path().filename().replace_extension().string());
         }
     }
@@ -118,9 +117,9 @@ void Game::Update(float dt)
 {
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
-            BallObject* Ball = dynamic_cast<BallObject*>(object);
-            if (Ball != nullptr && Ball->pop) {
-                Ball->Pop(dt);
+            AttackerObject* Attacker = dynamic_cast<AttackerObject*>(object);
+            if (Attacker != nullptr && Attacker->pop) {
+                Attacker->Pop(dt);
             }
             object->Move(dt, this->Width, this->Height);
         }
@@ -288,10 +287,11 @@ void Game::DoCollisions() {
     //COLLISION WITH WEAPONS
     for (int i = 0; i < this->Levels[this->Level]->Objects.size(); ++i) {
         auto& object = this->Levels[this->Level]->Objects[i];
-        if (object->Destroyed) {
+        AttackerObject* Attacker = dynamic_cast<AttackerObject*>(object);
+        if (object->Destroyed || (Attacker && Attacker->pop)) {
             continue;
         }
-        BallObject* Ball = dynamic_cast<BallObject*>(object);
+
         for (auto& Weapon : Player->Weapons) {
             if (!Weapon->Using) {
                 continue;
@@ -309,21 +309,25 @@ void Game::DoCollisions() {
                     }
 
                     //Create new balls half the size of the collision ball
-                    if (Ball != nullptr && object->Size.x / 4.0f > 12.0f) {
-                        Ball->pop = true;
+                    if (Attacker) {
+                        SoundEngine->play2D("../audio/ball-pop.mp3");
+                    }
+
+                    if (Attacker && object->Size.x / 4.0f > 12.0f) {
+                        Attacker->pop = true;
                         glm::vec3 Position = object->Position;
                         float radius = object->Size.x / 4.0f;
 
-                        BallObject* a = nullptr;
-                        BallObject* b = nullptr;
-                        if(dynamic_cast<HexagonObject*>(Ball) != nullptr) {
-                            a = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
-                            b = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                        AttackerObject* a = nullptr;
+                        AttackerObject* b = nullptr;
+                        if(dynamic_cast<HexagonObject*>(object)) {
+                            a = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Attacker->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            b = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), Attacker->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                             a->Velocity = -a->Velocity;
                         }
-                        else {
-                            a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
-                            b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Ball->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                        else if(dynamic_cast<BallObject*>(object)) {
+                            a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Attacker->Color, glm::vec3(130.0f, 190.0f, 0.0f));
+                            b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), Attacker->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                             a->Velocity = -a->Velocity;
                             b->Velocity.y = -b->Velocity.y;
                         }
@@ -351,34 +355,34 @@ void Game::DoCollisions() {
 
     //COLLISION BALLS WITH OTHER OBJECTS IN LEVEL
     for (auto& object : this->Levels[this->Level]->Objects) {
-        BallObject* Ball = dynamic_cast<BallObject*>(object);
-        if (object->Destroyed || Ball == nullptr) {
+        AttackerObject* Attacker = dynamic_cast<AttackerObject*>(object);
+        if (object->Destroyed || !Attacker || Attacker->pop) {
             continue;
         }
         
         for (auto& obj : this->Levels[this->Level]->Objects) {
             BlockObject* Obj = dynamic_cast<BlockObject*>(obj);
-            if (obj->Destroyed || Obj == nullptr)
+            if (!Obj || Obj->Destroyed)
                 continue;
 
-            Collision& collisionBallObj = Ball->checkCollision(*Obj);
+            Collision& collisionBallObj = Attacker->checkCollision(*Obj);
             if (collisionBallObj.collision) {
                 if (collisionBallObj.direction == LEFT || collisionBallObj.direction == RIGHT)
                 {
-                    Ball->Velocity.x = -Ball->Velocity.x;
-                    float penetration = Ball->Radius - std::abs(collisionBallObj.difference.x);
+                    Attacker->Velocity.x = -Attacker->Velocity.x;
+                    float penetration = Attacker->Radius - std::abs(collisionBallObj.difference.x);
                     if (collisionBallObj.direction == LEFT)
-                        Ball->Position.x += penetration;
+                        Attacker->Position.x += penetration;
                     else
-                        Ball->Position.x -= penetration;
+                        Attacker->Position.x -= penetration;
                 }
                 else {
-                    Ball->Velocity.y = -Ball->Velocity.y;
-                    float penetration = Ball->Radius - std::abs(collisionBallObj.difference.y);
+                    Attacker->Velocity.y = -Attacker->Velocity.y;
+                    float penetration = Attacker->Radius - std::abs(collisionBallObj.difference.y);
                     if (collisionBallObj.direction == UP)
-                        Ball->Position.y -= penetration;
+                        Attacker->Position.y -= penetration;
                     else
-                        Ball->Position.y += penetration;
+                        Attacker->Position.y += penetration;
                 }
             }
         }
@@ -392,7 +396,7 @@ void Game::DoCollisions() {
         }
         Collision& collisionBallPlayer = object->checkCollision(*Player);
         if (collisionBallPlayer.collision) {
-            if (dynamic_cast<BallObject*>(object) != nullptr) {
+            if (dynamic_cast<AttackerObject*>(object) != nullptr) {
                 --this->Lives;
                 SoundEngine->stopAllSounds();
                 std::this_thread::sleep_for(std::chrono::seconds(1));

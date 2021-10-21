@@ -34,7 +34,7 @@ bool PlayerLadderCollision = false;
 bool PlayerBlockCollision = false;
 
 Game::Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(), currentWindow(currentWindow) {}
+    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(new GameMenu("../game.menu")), currentWindow(currentWindow) {}
 
 Game::~Game()
 {
@@ -77,7 +77,7 @@ void Game::LoadFiles() {
         level->Load(this->Width, this->Height);
         this->Levels.push_back(level);
     }
-    this->Menu.Load("../game.menu", this->Width, this->Height);
+    this->Menu->Load(this->Width, this->Height);
 }
 
 
@@ -197,33 +197,42 @@ void Game::ProcessInput(float dt)
     }
 
     if (this->State == GAME_MENU) {
-        if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
-            if (this->Menu.Selected == 0) {
-                SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../audio/stage1.mp3", true);
-                this->Reset();
-                this->State = GAME_ACTIVE;
-                this->KeysProcessed[GLFW_KEY_ENTER] = true;
-            }
-            if (this->Menu.Selected == this->Menu.Options.size() - 1) {
-                glfwSetWindowShouldClose(this->currentWindow, true);
-                this->KeysProcessed[GLFW_KEY_ENTER] = true;
+       
+        if (this->Keys[GLFW_KEY_BACKSPACE] && !this->KeysProcessed[GLFW_KEY_BACKSPACE]) {
+            this->KeysProcessed[GLFW_KEY_BACKSPACE] = true;
+            if (this->Menu->Selected->ParentOption) {
+                this->Menu->Selected = this->Menu->Selected->ParentOption;
             }
         }
+
+        if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
+            this->KeysProcessed[GLFW_KEY_ENTER] = true;
+            if (this->Menu->Selected->Options[this->Menu->Selected->Selected]->Options.size() > 0) {
+                this->Menu->Selected = this->Menu->Selected->Options[this->Menu->Selected->Selected];
+            }
+
+            auto& val = this->Menu->Selected->Options[this->Menu->Selected->Selected]->Value;
+            if (val == "GAME START") {
+                SoundEngine->stopAllSounds();
+                SoundEngine->play2D("../audio/stage1.mp3", true);
+                this->State = GAME_ACTIVE;
+                this->Reset();
+            }
+            if (val == "EXIT") {
+                glfwSetWindowShouldClose(currentWindow, true);
+            }
+        }
+
         if (this->Keys[GLFW_KEY_S] && !this->KeysProcessed[GLFW_KEY_S]) {
             this->KeysProcessed[GLFW_KEY_S] = true;
-            if (this->Menu.Selected < this->Menu.Options.size() - 1) {
-                this->Menu.Options[this->Menu.Selected].Selected = false;
-                ++this->Menu.Selected;
-                this->Menu.Options[this->Menu.Selected].Selected = true;
+            if (this->Menu->Selected->Selected < this->Menu->Selected->Options.size() - 1) {
+                ++this->Menu->Selected->Selected;
             }
         }
         if (this->Keys[GLFW_KEY_W] && !this->KeysProcessed[GLFW_KEY_W]) {
             this->KeysProcessed[GLFW_KEY_W] = true;
-            if (this->Menu.Selected > 0) {
-                this->Menu.Options[this->Menu.Selected].Selected = false;
-                --this->Menu.Selected;
-                this->Menu.Options[this->Menu.Selected].Selected = true;
+            if (this->Menu->Selected->Selected > 0) {
+                --this->Menu->Selected->Selected;
             }
         }
     }
@@ -268,7 +277,7 @@ void Game::Render()
 
     if (this->State == GAME_MENU) {
         Renderer->DrawSprite(ResourceManager::GetTexture("background-menu"), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
-        Menu.Draw(*Text);
+        this->Menu->Draw(*Text);
     }
 
     if (this->State == GAME_WIN)

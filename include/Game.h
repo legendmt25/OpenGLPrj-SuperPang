@@ -21,7 +21,7 @@ class Game
 {
     GLFWwindow* currentWindow;
 public:
-    GameMenu Menu;
+    GameMenu* Menu;
     GameState State;	
     static bool Keys[1024];
     static bool KeysProcessed[1024];

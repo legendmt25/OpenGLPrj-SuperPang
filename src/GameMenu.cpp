@@ -1,49 +1,63 @@
 #include <GameMenu.h>
 #include <iostream>
 
-Option::Option(std::string Value, glm::vec2 Position, float FontSize, std::list<Option> Options)
-	:Value(Value), Position(Position), FontSize(FontSize), Selected(false) {}
+Option::Option(std::string Value, glm::vec2 Position, float FontSize)
+	:Value(Value), Position(Position), FontSize(FontSize), Selected(false), Options(), ParentOption(nullptr) {}
 
 void Option::Draw(TextRenderer& Renderer) {
-	std::string h = "";
-	if (this->Selected) {
-		h = "->";
-	}
-	Renderer.RenderText(h + this->Value, this->Position.x, this->Position.y, 1.0f);
-}
-
-GameMenu::GameMenu(std::vector<Option> Options)
-	:GameMenu()
-{
-	this->Options = Options;
-	if (this->Options.size() > 0) {
-		this->Options[0].Selected = true;
+	for (int i = 0; i < this->Options.size(); ++i) {
+		auto& option = this->Options[i];
+		if (i == this->Selected) {
+			Renderer.RenderText("->" + option->Value, option->Position.x, option->Position.y, 1.0f);
+			continue;
+		}
+		Renderer.RenderText(option->Value, option->Position.x, option->Position.y, 1.0f);
 	}
 }
 
 void GameMenu::Draw(TextRenderer& Renderer) {
-	for (auto& option : this->Options) {
-		option.Draw(Renderer);
-	}
+	this->Selected->Draw(Renderer);
 }
 
-void GameMenu::loadMenuFromFile(const char* gameMenuFile, unsigned int windowWidth, unsigned int windowHeight) {
-	std::ifstream fileStream(gameMenuFile);
-	std::string line;
+int countSpaces(std::string line) {
+	int spaces = 0;
+	while (line[spaces] == ' ') {
+		++spaces;
+	}
+	return spaces;
+}
+
+void GameMenu::loadMenuFromFile(unsigned int windowWidth, unsigned int windowHeight, std::vector<Option*>& Options, Option* Parent) {
+	static std::ifstream fileStream(this->Path);
+	static std::string line;
 	float fontSize = 12.0f;
 	int offset = 0;
+	int offsetInc = 20;
+	static int i = 0;
+
+	if (line != "") {
+		Options.push_back(new Option(line.substr(i), glm::vec2(windowWidth / 2.0f - line.size() * fontSize, windowHeight / 2.0f + offset)));
+		Options[Options.size() - 1]->ParentOption = Parent;
+		offset += offsetInc;
+	}
 
 	while (std::getline(fileStream, line)) {
-		if (line[0] != ' ') {
-			this->Options.push_back(Option(line, glm::vec2(windowWidth / 2.0f - line.size() * fontSize, windowHeight / 2.0f + offset)));
-			offset += 20;
+		if (countSpaces(line) > i) {
+			++i;
+			this->loadMenuFromFile(windowWidth, windowHeight, Options[Options.size() - 1]->Options, Options[Options.size() - 1]);
 		}
+
+		if (countSpaces(line) < i) {
+			--i;
+			return;
+		}
+
+		Options.push_back(new Option(line.substr(i), glm::vec2(windowWidth / 2.0f - line.size() * fontSize, windowHeight / 2.0f + offset)));
+		Options[Options.size() - 1]->ParentOption = Parent;
+		offset += offsetInc;
 	}
 }
 
-void GameMenu::Load(const char* gameMenuFile, unsigned int windowWidth, unsigned int windowHeight) {
-	this->loadMenuFromFile(gameMenuFile, windowWidth, windowHeight);
-	if (this->Options.size() > 0) {
-		this->Options[0].Selected = true;
-	}
+void GameMenu::Load(unsigned int windowWidth, unsigned int windowHeight) {
+	this->loadMenuFromFile(windowWidth, windowHeight, this->Selected->Options, this->Selected);
 }

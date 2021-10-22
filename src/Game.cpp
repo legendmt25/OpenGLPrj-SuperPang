@@ -54,7 +54,7 @@ void Game::LoadFiles() {
     ResourceManager::LoadShader("../resources/shaders/sprite.vs", "../resources/shaders/sprite.fs", NULL, "sprite");
     ResourceManager::LoadShader("../resources/shaders/text.vs", "../resources/shaders/text.fs", NULL, "text");
     ResourceManager::LoadShader("../resources/shaders/sprite3D.vs", "../resources/shaders/sprite3D.fs", NULL, "sprite3D");
-    std::vector<std::string> texturesDirectories = { "../resources/textures/", "../resources/levels/backgrounds/", "../resources/textures/powerups/" };
+    std::vector<std::string> texturesDirectories = { "../resources/textures/", "../resources/levels/backgrounds/", "../resources/textures/powerups/", "../resources/background-menu" };
     //load textures
     for (auto& dir : texturesDirectories) {
         for (auto& file : std::experimental::filesystem::directory_iterator(dir)) {
@@ -65,13 +65,16 @@ void Game::LoadFiles() {
                 powerups.push_back(file.path().filename().replace_extension().string());
             }
             //std::cout << file.path().string() << std::endl;
-            ResourceManager::LoadTexture(file.path().string().c_str(), file.path().extension() == ".png" && file.path().string().find("levels") == -1 && file.path().filename().string()[0] != '-', file.path().filename().replace_extension().string());
+            bool alpha = file.path().extension() == ".png" && file.path().string().find("levels") == -1 && file.path().filename().string()[0] != '-';
+            ResourceManager::LoadTexture(file.path().string().c_str(), alpha, file.path().filename().replace_extension().string());
         }
     }
 
+
+
     //load levels
     for (auto& file : std::experimental::filesystem::directory_iterator("../resources/levels/")) {
-        if (file.path().string().find("background") != -1) {
+        if (file.path().extension().string() == "") {
             continue;
         }
         GameLevel* level = new GameLevel(file.path().string().c_str());
@@ -110,8 +113,22 @@ void Game::Init()
     SoundEngine->play2D("../resources/audio/mode-select.mp3", true);
 }
 
+
+float frameBackground = 0.0f;
+int start = 0;
+
 void Game::Update(float dt)
 {
+    if (this->State == GAME_MENU) {
+        if (frameBackground >= 0.065f) {
+            ++start;
+            frameBackground = 0.0f;
+        }
+        else {
+            frameBackground += dt;
+        }
+    }
+
     if (this->State == GAME_ACTIVE) {
         for (auto& object : this->Levels[Level]->Objects) {
             object->Move(dt, this->Width, this->Height);
@@ -203,6 +220,7 @@ void Game::ProcessInput(float dt)
             this->KeysProcessed[GLFW_KEY_BACKSPACE] = true;
             if (this->Menu->Selected->ParentOption) {
                 this->Menu->Selected = this->Menu->Selected->ParentOption;
+                SoundEngine->play2D("../resources/audio/menu-select.mp3");
             }
         }
 
@@ -222,18 +240,21 @@ void Game::ProcessInput(float dt)
             if (val == "EXIT") {
                 glfwSetWindowShouldClose(currentWindow, true);
             }
+            SoundEngine->play2D("../resources/audio/menu-select.mp3");
         }
 
         if (this->Keys[GLFW_KEY_S] && !this->KeysProcessed[GLFW_KEY_S]) {
             this->KeysProcessed[GLFW_KEY_S] = true;
             if (this->Menu->Selected->Selected < this->Menu->Selected->Options.size() - 1) {
                 ++this->Menu->Selected->Selected;
+                SoundEngine->play2D("../resources/audio/menu-select.mp3");
             }
         }
         if (this->Keys[GLFW_KEY_W] && !this->KeysProcessed[GLFW_KEY_W]) {
             this->KeysProcessed[GLFW_KEY_W] = true;
             if (this->Menu->Selected->Selected > 0) {
                 --this->Menu->Selected->Selected;
+                SoundEngine->play2D("../resources/audio/menu-select.mp3");
             }
         }
     }
@@ -247,6 +268,8 @@ void Game::ProcessInput(float dt)
         }
     }
 }
+
+
 
 void Game::Render()
 {
@@ -277,7 +300,14 @@ void Game::Render()
     }
 
     if (this->State == GAME_MENU) {
-        Renderer->DrawSprite(ResourceManager::GetTexture("background-menu"), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
+        std::string st = std::to_string(start);
+        std::reverse(st.begin(), st.end());
+        while (st.size() < 4) {
+            st.push_back('0');
+        }
+        std::reverse(st.begin(), st.end());
+
+        Renderer->DrawSprite(ResourceManager::GetTexture("background-menu-" + st), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
         this->Menu->Draw(*Text);
     }
 
@@ -384,6 +414,7 @@ void Game::DoCollisions() {
                     }
                 }
                 else {
+                    SoundEngine->play2D("../resources/audio/solid.wav");
                     object->Destroyed = true;
                     this->ShouldGeneratePowerUp(*object);
                     Weapon->Reset(Player);

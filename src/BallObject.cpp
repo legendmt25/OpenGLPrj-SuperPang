@@ -7,22 +7,19 @@ BallObject::BallObject(glm::vec3 position, float radius, Texture2D texture, glm:
 BallObject::BallObject()
 	:AttackerObject(), Gravity(0.0f, 1.4f, 0.0f) {}
 
-float framePopBall = 0.0f;
 unsigned int PopTextureBall = 1;
 
 void BallObject::Pop(float dt) {
 	if (this->pop) {
-		if (framePopBall >= 0.01f) {
-			this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureBall));
-			framePopBall = 0.0f;
-			++PopTextureBall;
+		if (PopTextureBall < 5) {
+			if (frameCount(dt, frameMap["pop-ball"], 0.01f)) {
+				this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureBall));
+				++PopTextureBall;
+			}
 		}
 		else {
-			framePopBall += dt;
-		}
-		if (PopTextureBall >= 5) {
 			this->Destroyed = true;
-			framePopBall = 0.0f;
+			this->pop = false;
 			PopTextureBall = 1;
 		}
 	}
@@ -34,15 +31,15 @@ glm::vec3& BallObject::Move(float dt, unsigned int windowWidth, unsigned int win
 	this->Velocity += this->Gravity;
 	
 	if (this->Position.x + this->Size.x / 2.0f > windowWidth || this->Position.x < this->Size.x / 2.0f) {
-		this->Velocity.x *= -1.0f;
+		this->Velocity.x = -this->Velocity.x;
 	}
 	if (this->Position.y <= this->Size.y / 2.0f) {
-		this->Velocity.y *= 1.0f;
+		this->Velocity.y = -this->Velocity.y;
 		this->Position.y = this->Size.y / 2.0f;
 	}
 
 	if (this->Position.y - this->Size.y / 2.0f >= windowHeight - this->Size.y) {
-		this->Velocity.y *= -1.0f;
+		this->Velocity.y = -this->Velocity.y;
 		this->Position.y = windowHeight - this->Size.y / 2.0f;
 		this->Gravity = glm::vec3(0.0f, 1.6f, 0.0f);
 	}

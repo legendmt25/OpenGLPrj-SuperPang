@@ -1,3 +1,4 @@
+#pragma once
 #include <Utility.h>
 
 Direction VectorDirection(glm::vec2 target) {
@@ -18,6 +19,15 @@ Direction VectorDirection(glm::vec2 target) {
         }
     }
     return (Direction) best;
+}
+
+bool frameCount(const float& dt, float& frame, const float toFrame) {
+    frame += dt;
+    if (frame >= toFrame) {
+        frame = 0.0f;
+        return true;
+    }
+    return false;
 }
 
 Collision::Collision(bool collision, Direction direction, glm::vec2 difference)

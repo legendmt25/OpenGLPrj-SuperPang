@@ -4,6 +4,7 @@
 #include <cstring>
 #include <thread>
 #include <chrono>
+#include <Windows.h>
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <filesystem>
@@ -33,8 +34,9 @@ std::vector<std::string> powerups;
 bool PlayerLadderCollision = false;
 bool PlayerBlockCollision = false;
 
+
 Game::Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Width(width), Height(height), Lives(lives), Level(0), Menu(new GameMenu("../resources/game.menu")), currentWindow(currentWindow) {}
+    : State(GAME_MENU), Width(width), Height(height), Level(0), Menu(new GameMenu("../resources/game.menu")), currentWindow(currentWindow) {}
 
 Game::~Game()
 {
@@ -88,6 +90,11 @@ void Game::LoadFiles() {
 
 void Game::Init()
 {
+    std::vector<std::string> frameCounters = { "background", "sleep", "pop-ball", "pop-hexagon", "hexagon", "character-walk", "character-up" , "power-up-destroy"};
+    for (auto& frameCounter : frameCounters) {
+        frameMap[frameCounter] = 0.0f;
+    }
+
     this->LoadFiles();
 
     ResourceManager::GetShader("sprite").SetInteger("image", 0, true);
@@ -114,18 +121,22 @@ void Game::Init()
 }
 
 
-float frameBackground = 0.0f;
 int start = 0;
+bool wasSleeping = false;
+float sleepForFrames;
 
 void Game::Update(float dt)
 {
-    if (this->State == GAME_MENU) {
-        if (frameBackground >= 0.065f) {
-            ++start;
-            frameBackground = 0.0f;
+    if (this->State == GAME_SLEEP) {
+        if (frameCount(dt, frameMap["background"], sleepForFrames)) {
+            this->State = GAME_ACTIVE;
+            wasSleeping = true;
         }
-        else {
-            frameBackground += dt;
+    }
+
+    if (this->State == GAME_MENU) {
+        if (start < 310 && frameCount(dt, frameMap["sleep"], 0.065f)) {
+            ++start;
         }
     }
 
@@ -141,29 +152,30 @@ void Game::Update(float dt)
             object->Move(dt, this->Width, this->Height);
         }
 
-        this->DoCollisions();
-
         if (!PlayerBlockCollision && !PlayerLadderCollision) {
             Player->Move(dt, this->Width, this->Height);
         }
-
-        GameLevel& currentLevel = *this->Levels[Level];
-        if (currentLevel.isCompleted()) {
-            if (this->Level == this->Levels.size() - 1) {
-                this->State = GAME_WIN;
+        if (this->Levels[Level]->isCompleted()) {
+            if (!wasSleeping) {
                 SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../resources/audio/congratulations.mp3");
-                std::this_thread::sleep_for(std::chrono::seconds(6));
+                if (this->Level == this->Levels.size() - 1) {
+                    this->State = GAME_WIN;
+                    SoundEngine->play2D("../resources/audio/congratulations.mp3");
+                }
+                else {
+                    this->State = GAME_SLEEP;
+                    sleepForFrames = 5.0f;
+                    SoundEngine->play2D("../resources/audio/stage-clear.mp3");
+                }
             }
             else {
-                SoundEngine->stopAllSounds();
-                SoundEngine->play2D("../resources/audio/stage-clear.mp3");
-                std::this_thread::sleep_for(std::chrono::seconds(4));
                 Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
                 Player->ResetWeapons();
+                this->Levels[this->Level]->Reset();
                 ++this->Level;
+                SoundEngine->play2D("../resources/audio/stage1.mp3");
+                wasSleeping = false;
             }
-            currentLevel.Reset();
         }
 
 
@@ -188,30 +200,39 @@ void Game::Update(float dt)
             }
         }
 
-        if (this->Lives == 0) {
-            this->State = GAME_MENU;
+        if (Player->Lives == 0) {
+            this->State = GAME_OVER;
+            SoundEngine->play2D("../resources/audio/game-over.mp3");
+            start = 0;
         }
+
+        this->DoCollisions();
     }
 }
 
+GameState savedGameState;
 
 void Game::ProcessInput(float dt)
 {
     if (this->State == GAME_PAUSE) {
         if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
-            this->State = GAME_ACTIVE;
+            this->State = savedGameState;
+            SoundEngine->setAllSoundsPaused(false);
+            this->KeysProcessed[GLFW_KEY_ENTER] = true;
+        }
+    }
+
+    if (this->State == GAME_ACTIVE || this->State == GAME_SLEEP) {
+        if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
+            savedGameState = this->State;
+            SoundEngine->setAllSoundsPaused();
+            this->State = GAME_PAUSE;
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
         }
     }
 
     if (this->State == GAME_ACTIVE) {
-        if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {
-            this->State = GAME_PAUSE;
-            this->KeysProcessed[GLFW_KEY_ENTER] = true;
-        }
-
         Player->ProcessInput(dt, this->Width, this->Height, PlayerLadderCollision);
-
     }
 
     if (this->State == GAME_MENU) {
@@ -259,12 +280,14 @@ void Game::ProcessInput(float dt)
         }
     }
 
-    if (this->State == GAME_WIN)
+    if (this->State == GAME_WIN || this->State == GAME_OVER)
     {
         if (this->Keys[GLFW_KEY_ENTER])
         {
             this->KeysProcessed[GLFW_KEY_ENTER] = true;
             this->State = GAME_MENU;
+            SoundEngine->stopAllSounds();
+            SoundEngine->play2D("../resources/audio/mode-select.mp3");
         }
     }
 }
@@ -273,7 +296,7 @@ void Game::ProcessInput(float dt)
 
 void Game::Render()
 {
-    if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE) {
+    if (this->State == GAME_ACTIVE || this->State == GAME_PAUSE || this->State == GAME_SLEEP) {
         Renderer3D->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec3(this->Width / 2.0f, this->Height / 2.0f, 0.0f), glm::vec3(this->Width, this->Height, 1.0f), 0.0f, glm::vec3(1.0f));
         
         this->Levels[this->Level]->Draw(*Renderer3D);
@@ -291,7 +314,7 @@ void Game::Render()
             }
         }
 
-        Text->RenderText("Lives:" + std::to_string(this->Lives), 5.0f, this->Height - 20.0f, 1.0f);
+        Text->RenderText("Lives:" + std::to_string(Player->Lives), 5.0f, this->Height - 20.0f, 1.0f);
         
 
         if (this->State == GAME_PAUSE) {
@@ -311,11 +334,24 @@ void Game::Render()
         this->Menu->Draw(*Text);
     }
 
-    if (this->State == GAME_WIN)
-    {
-        Text->RenderText("You WON!!!", 320.0, Height / 2 - 20.0, 1.0, glm::vec3(0.0, 1.0, 0.0));
-        Text->RenderText("Press ENTER to retry or ESC to quit", 130.0, Height / 2, 1.0, glm::vec3(1.0, 1.0, 0.0));
+    if (this->State == GAME_WIN || this->State == GAME_OVER) {
+        Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(0.0f), glm::vec2(this->Width, this->Height), 0.0f, glm::vec3(1.0f));
+
+        std::string st = "Press ENTER to retry or ESC to quit";
+        float fontSize = 12.0f;
+
+        Text->RenderText(st, (this->Width - st.size() * fontSize) / 2.0f, this->Height / 2, 1.0, glm::vec3(0.0, 1.0, 0.0));
+        if (this->State == GAME_WIN) {
+            st = "You WON!!!";
+            Text->RenderText(st, (this->Width - st.size() * fontSize) / 2.0f, this->Height / 2 - 20.0, 1.0, glm::vec3(0.0, 1.0, 0.0));
+        }
+        if (this->State == GAME_OVER) {
+            float fontSize = 12.0f;
+            st = "GAME OVER!!!";
+            Text->RenderText(st, (this->Width - st.size() * fontSize) / 2.0f, this->Height / 2 - 20.0, 1.0, glm::vec3(0.0, 1.0, 0.0));
+        }
     }
+    
 }
 
 void Game::DoCollisions() {
@@ -323,14 +359,14 @@ void Game::DoCollisions() {
     //COLLISION POWERUPS AND WEAPONS
     for (auto& object : this->Levels[this->Level]->PowerUps) {
         for (auto& Weapon : Player->Weapons) {
-            if (Weapon->Using) {
-                Collision WeaponPowerUpCollision = object->checkCollision(*Weapon);
-                if (WeaponPowerUpCollision.collision) {
-                    object->Destroyed = true;
-                    Weapon->Reset(Player);
-                    object->Activate(Player);
-                    break;
-                }
+            if (!Weapon->Using) {
+                continue;
+            }
+            if (object->checkCollision(*Weapon).collision) {
+                object->Destroyed = true;
+                Weapon->Reset(Player);
+                object->Activate(Player);
+                break;
             }
         }
     }
@@ -356,8 +392,7 @@ void Game::DoCollisions() {
                 continue;
             }
 
-            Collision& collisionWeapon = object->checkCollision(*Weapon);
-            if (collisionWeapon.collision && !object->IsSolid) {
+            if (object->checkCollision(*Weapon).collision && !object->IsSolid) {
                 SoundEngine->play2D("../resources/audio/ball-pop.mp3");
                 object->pop = true;
                 Weapon->Using = false;
@@ -403,22 +438,19 @@ void Game::DoCollisions() {
             if (!Weapon->Using) {
                 continue;
             }
-            Collision collisionObjectWeapon = object->checkCollision(*Weapon);
-            if (collisionObjectWeapon.collision) {
+            if (object->checkCollision(*Weapon).collision) {
                 if (object->IsSolid) {
                     if (dynamic_cast<PowerArrowObject*>(Weapon)) {
                         dynamic_cast<PowerArrowObject*>(Weapon)->Stuck = true;
+                        break;
                     }
-                    else {
-                        Weapon->Reset(Player);
-                    }
-                }
-                else {
-                    SoundEngine->play2D("../resources/audio/solid.wav");
-                    object->Destroyed = true;
-                    this->ShouldGeneratePowerUp(*object);
                     Weapon->Reset(Player);
+                    break;
                 }
+                SoundEngine->play2D("../resources/audio/solid.wav");
+                object->Destroyed = true;
+                this->ShouldGeneratePowerUp(*object);
+                Weapon->Reset(Player);
             }
         }
     }
@@ -464,13 +496,26 @@ void Game::DoCollisions() {
         }
 
         if (Player->PlayerAttackerCollision(*object)) {
-            --this->Lives;
-            SoundEngine->stopAllSounds();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            this->Levels[Level]->Reset();
-            Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f));
-            Player->ResetWeapons();
-            SoundEngine->play2D("../resources/audio/stage1.mp3", true);
+            if (!wasSleeping) {
+                SoundEngine->stopAllSounds();
+                this->State = GAME_SLEEP;
+                sleepForFrames = 1.0f;
+            }
+            else {
+                Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
+                Player->ResetWeapons();
+                this->Levels[this->Level]->Reset();
+                --Player->Lives;
+                wasSleeping = false;
+
+                if (Player->Lives) {
+                    SoundEngine->play2D("../resources/audio/stage1.mp3", true);
+                    break;
+                }
+                SoundEngine->play2D("../resources/audio/game-over.mp3");
+                break;
+                
+            }
         }
     }
 
@@ -485,7 +530,7 @@ void Game::DoCollisions() {
                 PlayerBlockCollision = true;
             }
             else if (dynamic_cast<LadderObject*>(object)) {
-                PlayerLadderCollision |= collisionObjectPlayer.collision;
+                PlayerLadderCollision = true;
             }
         }
     }
@@ -493,10 +538,10 @@ void Game::DoCollisions() {
 
 void Game::Reset() {
     Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
-    //Player->Reset(glm::vec3(480.0f, 0.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
+    Player->ResetWeapons();
     this->Level = 0;
     this->Levels[this->Level]->Reset();
-    this->Lives = lives;
+    Player->Lives = lives;
 }
 
 void Game::ShouldGeneratePowerUp(GameObject& object)

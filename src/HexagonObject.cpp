@@ -9,17 +9,12 @@ HexagonObject::HexagonObject(glm::vec3 position, glm::vec3 size, Texture2D textu
 	: AttackerObject(position, size.x / 2.0f, texture, color, velocity) {}
 
 unsigned int HexagonTexture = 1;
-float frameHexagon = 0.0f;
 
 glm::vec3& HexagonObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
 	//std::cout << HexagonTexture << std::endl;
-	if (frameHexagon > 0.1f) {
+	if (frameCount(dt, frameMap["hexagon"], 0.1f)) {
 		this->Texture = ResourceManager::GetTexture("hexagon-" + std::to_string(HexagonTexture));
-		frameHexagon = 0.0f;
 		HexagonTexture = (HexagonTexture) % 3 + 1;
-	}
-	else {
-		frameHexagon += dt;
 	}
 
 	this->Position += this->Velocity * dt;
@@ -44,23 +39,18 @@ void HexagonObject::Reset(glm::vec3 position, glm::vec3 velocity) {
 	this->Velocity = velocity;
 }
 
-float framePopHexagon = 0.0f;
 unsigned int PopTextureHexagon = 1;
 
 void HexagonObject::Pop(float dt) {
 	if (this->pop) {
-		if (framePopHexagon >= 0.005f) {
-			this->Texture = ResourceManager::GetTexture("hexagon-pop-" + std::to_string(PopTextureHexagon));
-			framePopHexagon = 0.0f;
-			++PopTextureHexagon;
+		if (PopTextureHexagon < 5) {
+			if (frameCount(dt, frameMap["pop-hexagon"], 0.005)) {
+				this->Texture = ResourceManager::GetTexture("hexagon-pop-" + std::to_string(PopTextureHexagon));
+				++PopTextureHexagon;
+			}
 		}
 		else {
-			framePopHexagon += dt;
-		}
-
-		if (PopTextureHexagon >= 5) {
 			this->Destroyed = true;
-			framePopHexagon = 0.0f;
 			PopTextureHexagon = 1;
 		}
 	}

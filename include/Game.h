@@ -14,7 +14,9 @@ enum GameState {
     GAME_PAUSE,
     GAME_ACTIVE,
     GAME_MENU,
-    GAME_WIN
+    GAME_WIN,
+    GAME_OVER,
+    GAME_SLEEP
 };
 
 class Game
@@ -28,7 +30,6 @@ public:
     unsigned int Width, Height;
     std::vector<GameLevel*> Levels;
     unsigned int Level;
-    unsigned int Lives;
 
     Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height);
     ~Game();

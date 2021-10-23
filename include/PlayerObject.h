@@ -8,6 +8,7 @@ class PlayerObject: public GameObject
 {
 public:
 	std::list<WeaponObject*> Weapons;
+	unsigned int Lives;
 
 	PlayerObject();
 	~PlayerObject();

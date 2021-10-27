@@ -1,12 +1,19 @@
 #include "PlayerObject.h"
 #include "ResourceManager.h"
 #include "Game.h"
+
 PlayerObject::PlayerObject()
     :GameObject(), Lives(5) {}
 
-PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
+PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity, int playerNumber)
     : GameObject(position, size, texture, color, velocity), Lives(5)
 {
+    if (playerNumber == 1) {
+        playerMovement = PlayerMovement(GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_SPACE, GLFW_KEY_X);
+    }
+    else {
+        playerMovement = PlayerMovement(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_K, GLFW_KEY_L);
+    }
     this->Weapons.push_back(new ArrowObject(*this, glm::vec3(500.0f)));
 }
 
@@ -68,32 +75,32 @@ int PlayerUpTexture = 1;
 void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned int window_height, bool collided) {
     std::string direction = "";
 
-    if (Game::Keys[GLFW_KEY_LEFT]) {
+    if (Game::Keys[playerMovement.LEFT]) {
         if (this->Position.x >= this->Size.x / 2.0f) {
             this->Position.x -= this->Velocity.x * dt;
         }
         direction = "-left-";
     }
 
-    if (Game::Keys[GLFW_KEY_RIGHT]) {
+    if (Game::Keys[playerMovement.RIGHT]) {
         if (this->Position.x <= window_width - this->Size.x / 2.0f) {
             this->Position.x += this->Velocity.x * dt;
         }
         direction = "-right-";
     }
 
-    if (Game::Keys[GLFW_KEY_RIGHT] || Game::Keys[GLFW_KEY_LEFT]) {
+    if (Game::Keys[playerMovement.RIGHT] || Game::Keys[playerMovement.LEFT]) {
         if (frameCount(dt, frameMap["character-walk"], 0.1f)) {
             PlayerTexture = (PlayerTexture) % 4 + 1;
         }
         this->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
     }
 
-    if (Game::Keys[GLFW_KEY_SPACE] || Game::Keys[GLFW_KEY_X]) {
+    if (Game::Keys[playerMovement.SHOOT1] || Game::Keys[playerMovement.SHOOT2]) {
         this->Texture = ResourceManager::GetTexture("character-shoot");
     }
 
-    if (Game::Keys[GLFW_KEY_UP] && collided) {
+    if (Game::Keys[playerMovement.UP] && collided) {
         if (collided && this->Position.y > this->Size.y / 2.0f) {
             this->Position.y -= this->Velocity.y * dt;
         }
@@ -104,7 +111,7 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
         this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(PlayerUpTexture));
     }
 
-    if (Game::Keys[GLFW_KEY_DOWN] && collided) {
+    if (Game::Keys[playerMovement.DOWN] && collided) {
         if (collided && this->Position.y < window_height - this->Size.y / 2.0f) {
             this->Position.y += this->Velocity.y * dt;
         }
@@ -118,14 +125,14 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
         }
     }
 
-    if ((Game::Keys[GLFW_KEY_SPACE] && !Game::KeysProcessed[GLFW_KEY_SPACE]) || (Game::Keys[GLFW_KEY_X] && !Game::KeysProcessed[GLFW_KEY_X])) {
+    if ((Game::Keys[playerMovement.SHOOT1] && !Game::KeysProcessed[playerMovement.SHOOT1]) || (Game::Keys[playerMovement.SHOOT2] && !Game::KeysProcessed[playerMovement.SHOOT2])) {
         this->Texture = ResourceManager::GetTexture("character-shoot");
         this->Shoot();
-        Game::KeysProcessed[GLFW_KEY_SPACE] = true;
-        Game::KeysProcessed[GLFW_KEY_X] = true;
+        Game::KeysProcessed[playerMovement.SHOOT1] = true;
+        Game::KeysProcessed[playerMovement.SHOOT2] = true;
     }
 
-    if (!Game::Keys[GLFW_KEY_RIGHT] && !Game::Keys[GLFW_KEY_LEFT] && !Game::Keys[GLFW_KEY_SPACE] && !Game::Keys[GLFW_KEY_X] && (!Game::Keys[GLFW_KEY_UP] || !collided) && (!Game::Keys[GLFW_KEY_DOWN] || !collided)) {
+    if (!Game::Keys[playerMovement.RIGHT] && !Game::Keys[playerMovement.LEFT] && !Game::Keys[playerMovement.SHOOT1] && !Game::Keys[playerMovement.SHOOT2] && (!Game::Keys[playerMovement.UP] || !collided) && (!Game::Keys[playerMovement.DOWN] || !collided)) {
         this->Texture = ResourceManager::GetTexture("character-init");
         PlayerTexture = 1;
         PlayerUpTexture = 1;

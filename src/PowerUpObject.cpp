@@ -14,7 +14,7 @@ glm::vec3& PowerUpObject::Move(float dt, unsigned int windowWidth, unsigned int 
 	if (this->Position.y < windowHeight - this->Size.y / 2.0f) {
 		this->Position.y += this->Velocity.y * dt;
 	}
-	else if (frameCount(dt, frameMap["power-up-destroy"], 10.0f)) {
+	else if (frameCount(dt, this->frames, 10.0f)) {
 		this->Destroyed = true;
 	}
 	return this->Position;

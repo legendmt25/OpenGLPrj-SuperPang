@@ -39,14 +39,20 @@ file(GLOB PROJECT_SHADERS resources/shaders/*.comp
                           resources/shaders/*.vs
                           resources/shaders/*.fs
                           )
+file(GLOB PROJECT_TEXTURES resources/textures/*.png
+                           resources/textures/*.jpg
+                           )
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
                           Readme.md
                          .gitattributes
                          .gitignore
                          .gitmodules)
+file(GLOB PROJECT_AUDIO resources/audio/*.mp3)
 
 source_group("include" FILES ${PROJECT_HEADERS})
 source_group("shaders" FILES ${PROJECT_SHADERS})
+source_group("textures" FILES ${PROJECT_TEXTURES})
+source_group("audio" FILES ${PROJECT_AUDIO})
 source_group("src" FILES ${PROJECT_SOURCES})
 source_group("vendors" FILES ${VENDORS_SOURCES})
 
@@ -55,7 +61,8 @@ add_definitions(-DGLFW_INCLUDE_NONE
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
-                               ${VENDORS_SOURCES})
+                               ${VENDORS_SOURCES} ${PROJECT_TEXTURES}
+			       ${PROJECT_AUDIO})
 
 target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} freetype ${CMAKE_SOURCE_DIR}/vendor/irrKlang/lib/Winx64-visualStudio/irrKlang.lib)
 file(COPY ${CMAKE_SOURCE_DIR}/vendor/irrKlang/bin/winx64-visualStudio/ikpFlac.dll

@@ -48,13 +48,14 @@ unsigned int PopTextureHexagon = 1;
 void HexagonObject::Pop(float dt) {
 	if (this->pop) {
 		if (PopTextureHexagon < 5) {
-			if (frameCount(dt, frameMap["pop-hexagon"], 0.005)) {
+			if (frameCount(dt, frames, 0.005f)) {
 				this->Texture = ResourceManager::GetTexture("hexagon-pop-" + std::to_string(PopTextureHexagon));
 				++PopTextureHexagon;
 			}
 		}
 		else {
 			this->Destroyed = true;
+			this->pop = false;
 			PopTextureHexagon = 1;
 		}
 	}

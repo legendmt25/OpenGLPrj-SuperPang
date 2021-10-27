@@ -2,8 +2,6 @@
 #include <sstream>
 #include <string>
 #include <cstring>
-#include <thread>
-#include <chrono>
 #include <Windows.h>
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
@@ -27,7 +25,7 @@ Sprite3DRenderer* Renderer3D = nullptr;
 SphereRenderer* RendererSphere_36sectors_18stacks = nullptr;
 SphereRenderer* RendererSphere_12sectors_6stacks = nullptr;
 
-PlayerObject* Player = nullptr;
+PlayerObject* Player;
 TextRenderer* Text = nullptr;
 irrklang::ISoundEngine* SoundEngine = nullptr;
 const unsigned int lives = 5;
@@ -39,7 +37,7 @@ bool PlayerBlockCollision = false;
 
 
 Game::Game(GLFWwindow* currentWindow, unsigned int width, unsigned int height) 
-    : State(GAME_MENU), Width(width), Height(height), Level(0), Menu(new GameMenu("../resources/game.menu")), currentWindow(currentWindow) {}
+    : State(GameState::GAME_MENU), Width(width), Height(height), Level(0), Menu(new GameMenu("../resources/game.menu")), currentWindow(currentWindow) {}
 
 Game::~Game()
 {
@@ -48,10 +46,10 @@ Game::~Game()
     }
     delete Renderer;
     delete Renderer3D;
-    delete Player;
     delete Text;
     delete SoundEngine;
     delete Menu;
+    delete Player;
 }
 
 void Game::LoadFiles() {
@@ -118,7 +116,7 @@ void Game::Init()
     //glm::vec3 PlayerPosition(0.0f, 0.0f, 0.0f);
     
     //init objects
-    Player = new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity);
+    Player = new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity, 1);
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Renderer3D = new Sprite3DRenderer(ResourceManager::GetShader("sprite3D"));
     RendererSphere_36sectors_18stacks = new SphereRenderer(ResourceManager::GetShader("sphere"), 18, 36);
@@ -170,6 +168,7 @@ void Game::Update(float dt)
             if (!wasSleeping) {
                 SoundEngine->stopAllSounds();
                 if (this->Level == this->Levels.size() - 1) {
+                    this->Levels[this->Level]->Reset();
                     this->State = GAME_WIN;
                     SoundEngine->play2D("../resources/audio/congratulations.mp3");
                 }
@@ -311,7 +310,6 @@ void Game::Render()
         Renderer3D->DrawSprite(ResourceManager::GetTexture("background" + std::to_string(this->Level + 1)), glm::vec3(this->Width / 2.0f, this->Height / 2.0f, 0.0f), glm::vec3(this->Width, this->Height, 1.0f), 0.0f, glm::vec3(1.0f));
         
         this->Levels[this->Level]->Draw(*Renderer3D);
-        
         for (auto& Weapon : Player->Weapons) {
             if (Weapon->Using) {
                 Weapon->Draw(*Renderer3D);
@@ -330,7 +328,8 @@ void Game::Render()
             }
         }
 
-        Text->RenderText("Lives:" + std::to_string(Player->Lives), 5.0f, this->Height - 20.0f, 1.0f);
+
+       Text->RenderText("Lives:" + std::to_string(Player->Lives), 5.0f, this->Height - 20.0f, 1.0f);
         
 
         if (this->State == GAME_PAUSE) {
@@ -402,7 +401,6 @@ void Game::DoCollisions() {
         if (object->Destroyed || object->pop) {
             continue;
         }
-
         for (auto& Weapon : Player->Weapons) {
             if (!Weapon->Using) {
                 continue;
@@ -412,7 +410,7 @@ void Game::DoCollisions() {
                 SoundEngine->play2D("../resources/audio/ball-pop.mp3");
                 object->pop = true;
                 Weapon->Using = false;
-                
+
                 this->ShouldGeneratePowerUp(*object);
 
                 //Create new balls half the size of the collision ball
@@ -423,13 +421,13 @@ void Game::DoCollisions() {
 
                     AttackerObject* a = nullptr;
                     AttackerObject* b = nullptr;
-                    if(dynamic_cast<HexagonObject*>(object)) {
+                    if (dynamic_cast<HexagonObject*>(object)) {
                         a = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), object->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                         b = new HexagonObject(Position, glm::vec3(radius * 2.0f, radius * 2.0f, 1.0f), ResourceManager::GetTexture("hexagon-1"), object->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                         a->Velocity = -a->Velocity;
                         b->Velocity.y = -b->Velocity.y;
                     }
-                    else if(dynamic_cast<BallObject*>(object)) {
+                    else if (dynamic_cast<BallObject*>(object)) {
                         a = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), object->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                         b = new BallObject(Position, radius, ResourceManager::GetTexture("ball"), object->Color, glm::vec3(130.0f, 190.0f, 0.0f));
                         a->Velocity = -a->Velocity;
@@ -477,24 +475,24 @@ void Game::DoCollisions() {
             continue;
         }
         for (auto& obj : this->Levels[this->Level]->Objects) {
-            if (obj->Destroyed)
+            if (obj->Destroyed || dynamic_cast<LadderObject*>(obj))
                 continue;
 
-            Collision& collisionBallObj = object->checkCollision(*obj);
-            if (collisionBallObj.collision) {
-                if (collisionBallObj.direction == LEFT || collisionBallObj.direction == RIGHT)
+            Collision& collisionAttackerObj = object->checkCollision(*obj);
+            if (collisionAttackerObj.collision) {
+                if (collisionAttackerObj.direction == LEFT || collisionAttackerObj.direction == RIGHT)
                 {
                     object->Velocity.x = -object->Velocity.x;
-                    float penetration = object->Radius - std::abs(collisionBallObj.difference.x);
-                    if (collisionBallObj.direction == LEFT)
+                    float penetration = object->Radius - std::abs(collisionAttackerObj.difference.x);
+                    if (collisionAttackerObj.direction == LEFT)
                         object->Position.x += penetration;
                     else
                         object->Position.x -= penetration;
                 }
                 else {
                     object->Velocity.y = -object->Velocity.y;
-                    float penetration = object->Radius - std::abs(collisionBallObj.difference.y);
-                    if (collisionBallObj.direction == UP)
+                    float penetration = object->Radius - std::abs(collisionAttackerObj.difference.y);
+                    if (collisionAttackerObj.direction == UP)
                         object->Position.y -= penetration;
                     else
                         object->Position.y += penetration;
@@ -510,7 +508,6 @@ void Game::DoCollisions() {
         if (object->Destroyed || object->pop) {
             continue;
         }
-
         if (Player->PlayerAttackerCollision(*object)) {
             if (!wasSleeping) {
                 SoundEngine->stopAllSounds();
@@ -530,7 +527,6 @@ void Game::DoCollisions() {
                 }
                 SoundEngine->play2D("../resources/audio/game-over.mp3");
                 break;
-                
             }
         }
     }
@@ -555,9 +551,9 @@ void Game::DoCollisions() {
 void Game::Reset() {
     Player->Reset(glm::vec3((this->Width - Player->Size.x) / 2.0f, this->Height - Player->Size.y / 2.0f, 0.0f), glm::vec3(500.0f, 500.0f, 0.0f));
     Player->ResetWeapons();
-    this->Level = 0;
-    this->Levels[this->Level]->Reset();
     Player->Lives = lives;
+    this->Levels[this->Level]->Reset();
+    this->Level = 0;
 }
 
 void Game::ShouldGeneratePowerUp(GameObject& object)

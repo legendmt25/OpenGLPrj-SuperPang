@@ -8,6 +8,8 @@
 
 class GameObject
 {
+protected:
+	float frames = 0.0f;
 public:
 	glm::vec3 Position, Size, Velocity, Color;
 	float Rotation;

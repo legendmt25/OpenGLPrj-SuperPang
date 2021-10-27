@@ -32,12 +32,12 @@ file(GLOB PROJECT_HEADERS include/*.hpp
 			  include/*.h)
 
 file(GLOB PROJECT_SOURCES src/*.cpp)
-file(GLOB PROJECT_SHADERS shaders/*.comp
-                          shaders/*.frag
-                          shaders/*.geom
-                          shaders/*.vert
-                          shaders/*.vs
-                          shaders/*.fs
+file(GLOB PROJECT_SHADERS resources/shaders/*.comp
+                          resources/shaders/*.frag
+                          resources/shaders/*.geom
+                          resources/shaders/*.vert
+                          resources/shaders/*.vs
+                          resources/shaders/*.fs
                           )
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
                           Readme.md

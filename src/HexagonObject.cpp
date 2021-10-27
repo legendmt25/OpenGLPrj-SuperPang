@@ -13,8 +13,12 @@ unsigned int HexagonTexture = 1;
 glm::vec3& HexagonObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
 	//std::cout << HexagonTexture << std::endl;
 	if (frameCount(dt, frameMap["hexagon"], 0.1f)) {
-		this->Texture = ResourceManager::GetTexture("hexagon-" + std::to_string(HexagonTexture));
-		HexagonTexture = (HexagonTexture) % 3 + 1;
+		if (this->Rotation <= 360.0f) {
+			this->Rotation += 10.0f;
+		}
+		else {
+			this->Rotation = 0.0f;
+		}
 	}
 
 	this->Position += this->Velocity * dt;

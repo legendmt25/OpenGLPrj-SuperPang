@@ -11,7 +11,7 @@ class Shader
 {
 public:
     unsigned int ID; 
-    Shader() { }
+    Shader() = default;
     Shader  &Use();
     void    Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr);
 

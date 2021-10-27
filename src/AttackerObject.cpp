@@ -2,18 +2,17 @@
 #include "ResourceManager.h"
 
 AttackerObject::AttackerObject(glm::vec3 position, float radius, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	:GameObject(position, glm::vec3(2.0f * radius, 2.0f * radius, 1.0f), texture, color, velocity), Radius(radius), pop(false)
-{
-	this->Position.x += radius;
-	this->Position.y += radius;
-}
+	:GameObject(position, glm::vec3(2 * radius, 2 * radius, 1.0f), texture, color, velocity), Radius(radius), pop(false) {}
 
 AttackerObject::AttackerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	:AttackerObject(position, (float) size.x / 2.0f, texture, color, velocity) {}
+	:AttackerObject(position, size.x, texture, color, velocity) {}
 
 AttackerObject::AttackerObject()
 	:GameObject(), Radius(12.5f), pop(false) {}
 
+void AttackerObject::Draw(SphereRenderer& renderer) {
+	renderer.DrawSphere(this->Texture, this->Position, glm::vec3(this->Radius, this->Radius, 1.0f), this->Rotation, this->Color);
+}
 
 Collision AttackerObject::checkCollision(GameObject& obj) {
 	glm::vec2 center(this->Position);

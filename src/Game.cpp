@@ -57,7 +57,6 @@ void Game::LoadFiles() {
     ResourceManager::LoadShader("../resources/shaders/sprite.vs", "../resources/shaders/sprite.fs", NULL, "sprite");
     ResourceManager::LoadShader("../resources/shaders/text.vs", "../resources/shaders/text.fs", NULL, "text");
     ResourceManager::LoadShader("../resources/shaders/sprite3D.vs", "../resources/shaders/sprite3D.fs", NULL, "sprite3D");
-    ResourceManager::LoadShader("../resources/shaders/sphere.vs", "../resources/shaders/sphere.fs", NULL, "sphere");
     std::vector<std::string> texturesDirectories = { "../resources/textures/", "../resources/levels/backgrounds/", "../resources/textures/powerups/", "../resources/background-menu" };
     //load textures
     for (auto& dir : texturesDirectories) {
@@ -106,10 +105,6 @@ void Game::Init()
     ResourceManager::GetShader("sprite3D").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, 0.0f, 100.0f));
     ResourceManager::GetShader("sprite3D").SetMatrix4("view", glm::mat4(1.0f));
 
-    ResourceManager::GetShader("sphere").SetInteger("image", 0, true);
-    ResourceManager::GetShader("sphere").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, 0.0f, 100.0f));
-    ResourceManager::GetShader("sphere").SetMatrix4("view", glm::mat4(1.0f));
-
     //init Player
     glm::vec3 PlayerVelocity(500.0f);
     glm::vec3 PlayerSize(50.0f, 50.0f, 1.0f);
@@ -119,8 +114,8 @@ void Game::Init()
     Player = new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity, 1);
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Renderer3D = new Sprite3DRenderer(ResourceManager::GetShader("sprite3D"));
-    RendererSphere_36sectors_18stacks = new SphereRenderer(ResourceManager::GetShader("sphere"), 18, 36);
-    RendererSphere_12sectors_6stacks = new SphereRenderer(ResourceManager::GetShader("sphere"), 6, 12);
+    RendererSphere_36sectors_18stacks = new SphereRenderer(ResourceManager::GetShader("sprite3D"), 18, 36);
+    RendererSphere_12sectors_6stacks = new SphereRenderer(ResourceManager::GetShader("sprite3D"), 6, 12);
 
     Text = new TextRenderer(this->Width, this->Height);
     SoundEngine = irrklang::createIrrKlangDevice();

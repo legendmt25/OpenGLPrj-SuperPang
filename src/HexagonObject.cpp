@@ -49,7 +49,7 @@ void HexagonObject::Pop(float dt) {
 	if (this->pop) {
 		if (PopTextureHexagon < 5) {
 			if (frameCount(dt, frames, 0.005f)) {
-				this->Texture = ResourceManager::GetTexture("hexagon-pop-" + std::to_string(PopTextureHexagon));
+				this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureHexagon));
 				++PopTextureHexagon;
 			}
 		}

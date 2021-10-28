@@ -24,10 +24,7 @@ void SphereRenderer::DrawSphere(Texture2D& texture, glm::vec3 position, glm::vec
     texture.Bind();
 
     glBindVertexArray(this->QuadVAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, (void*)0);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 6 * squares * layers);
     glBindVertexArray(0);
 }
 
@@ -36,71 +33,49 @@ void SphereRenderer::initRenderData() {
     const int a = 5;
     const float PI = glm::pi<float>();
     std::vector<float> vertices;
+    float x, y, z;
 
-    float angleHStep = 2 * PI / squares;
-    float angleVStep = 4 * PI / layers;
-    float angleH = 0, angleV = 0;
+    for (int j = 0; j < this->layers; j++) {
+        float a1 = (float)j / this->layers * PI;
+        float a2 = (float)(j + 1) / this->layers * PI;
 
-    float s, t;
-    for (int i = 0; i < layers + 4; i++)
-    {
-        angleV = PI / 2 - i * angleVStep;
+        for (int i = 0; i <= this->squares; i++) {
+            float b = (float)i / this->squares * 2.0f * PI;
 
-        for (int j = 0; j <= squares; j++)
-        {
-            vertices.push_back(cos(angleV) * cos(angleH)); //x
-            vertices.push_back(cos(angleV) * sin(angleH)); //y
-            vertices.push_back(sin(angleV)); //z
+            x = (float)(cos(b) * sin(a1));
+            y = (float)(sin(b) * sin(a1));
+            z = (float)(cos(a1));
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+            vertices.push_back(b / (2.0f * PI));
+            vertices.push_back(a1 / PI);
 
-            s = (float)j / squares;
-            t = (float)i / layers;
-            vertices.push_back(s);
-            vertices.push_back(t);
-            angleH += angleHStep;
+            x = (float)(cos(b) * sin(a2));
+            y = (float)(sin(b) * sin(a2));
+            z = (float)(cos(a2));
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+            vertices.push_back(b / (2.0f * PI));
+            vertices.push_back(a2 / PI);
         }
     }
-
-    std::vector<int> indices;
-    int topLeft, bottomLeft;
-    for (int i = 0; i < layers; i++)
-    {
-        topLeft = i * (squares + 1);
-        bottomLeft = topLeft + squares + 1;
-
-        for (int j = 0; j < squares; j++, topLeft++, bottomLeft++)
-        {
-            indices.push_back(topLeft);
-            indices.push_back(bottomLeft);
-            indices.push_back(topLeft + 1);
-
-            indices.push_back(topLeft + 1);
-            indices.push_back(bottomLeft);
-            indices.push_back(bottomLeft + 1);
-        }
-    }
-
-    this->indicesCount = indices.size();
 
     unsigned int VBO;
     glGenVertexArrays(1, &this->QuadVAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &this->EBO);
 
-    glBindVertexArray(this->QuadVAO);
+    glBindVertexArray(QuadVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size(), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), &indices[0], GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, a * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, a * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

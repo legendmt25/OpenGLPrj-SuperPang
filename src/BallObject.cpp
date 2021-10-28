@@ -13,8 +13,7 @@ void BallObject::Pop(float dt) {
 	if (this->pop) {
 		if (PopTextureBall < 5) {
 			if (frameCount(dt, this->frames, 0.01f)) {
-				//this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureBall));
-				this->Radius /= 2.0f;
+				this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureBall));
 				++PopTextureBall;
 			}
 		}

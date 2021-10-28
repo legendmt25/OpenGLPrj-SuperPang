@@ -26,7 +26,7 @@ glm::vec3& GameObject::Move(float dt, unsigned int window_width, unsigned int wi
 }
 
 void GameObject::Reset() {
-    Destroyed = false;
+    this->Destroyed = false;
 }
 
 void GameObject::ProcessInput(float dt, unsigned int window_width, unsigned int window_height) {

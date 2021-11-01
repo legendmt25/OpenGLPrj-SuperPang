@@ -21,7 +21,6 @@ enum GameState {
 
 class Game
 {
-    GLFWwindow* currentWindow;
 public:
     GameMenu* Menu;
     GameState State;	
@@ -43,7 +42,9 @@ public:
     void Render();
     void DoCollisions();
     void Reset();
+    void ResetPlayers(bool withPlayerLives = false);
 private:
+    GLFWwindow* currentWindow;
     void ShouldGeneratePowerUp(GameObject& object);
 };
 

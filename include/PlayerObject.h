@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <list>
+#include <unordered_map>
 
 #include "WeaponObject.h"
 #include "Utility.h"
@@ -20,20 +21,25 @@ public:
 class PlayerObject: public GameObject
 {
 public:
+	std::unordered_map<std::string, bool> CollisionWith;
 	std::list<WeaponObject*> Weapons;
 	unsigned int Lives;
+	bool Alive;
 
 	PlayerObject();
 	~PlayerObject();
 	PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), int playerNumber = 1);
 	void Reset(glm::vec3 position, glm::vec3 velocity);
-	void ProcessInput(float dt, unsigned int window_width, unsigned int window_height, bool collided);
+	void ProcessInput(float dt, unsigned int window_width, unsigned int window_height);
 	void Shoot();
 
+	bool isAlive();
 	bool PlayerAttackerCollision(GameObject&);
-
 	void ResetWeapons();
 	glm::vec3& Move(float dt, unsigned int windowWidth, unsigned int windowHeight);
 private:
 	PlayerMovement playerMovement;
+	float frameUp;
+	float frameWalk;
+	unsigned short int UpTexture, WalkTexture;
 };

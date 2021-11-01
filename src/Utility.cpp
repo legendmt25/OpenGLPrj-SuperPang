@@ -1,5 +1,5 @@
-#pragma once
-#include <Utility.h>
+#include <iostream>
+#include "Utility.h"
 
 Direction VectorDirection(glm::vec2 target) {
     glm::vec2 compass[] = {
@@ -29,6 +29,27 @@ bool frameCount(const float& dt, float& frame, const float toFrame) {
     }
     return false;
 }
+
+std::vector<std::string> split(std::string str, std::string delimiter) {
+    std::vector<std::string> res;
+    size_t pos = 0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        res.push_back(str.substr(0, pos));
+        str.erase(0, pos + delimiter.size());
+    }
+    if (str.size() > 0) {
+        res.push_back(str);
+    }
+    return res;
+}
+
+std::string toLower(std::string str) {
+    for (auto& c : str) {
+        c = tolower(c);
+    }
+    return str;
+}
+
 
 Collision::Collision(bool collision, Direction direction, glm::vec2 difference)
     :collision(collision), direction(direction), difference(difference) {}

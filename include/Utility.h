@@ -1,7 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <unordered_map>
 #include <GLFW/glfw3.h>
+#include <string>
+#include <vector>
 
 enum Direction { 
 	UP, RIGHT, DOWN, LEFT 
@@ -21,4 +22,5 @@ public:
 	Collision(bool collision = false, Direction direction = Direction::UP, glm::vec2 difference = glm::vec2(0.0f));
 };
 
-static std::unordered_map<std::string, float> frameMap;
+std::vector<std::string> split(std::string str, std::string delimiter);
+std::string toLower(std::string str);

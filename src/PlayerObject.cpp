@@ -3,11 +3,13 @@
 #include "Game.h"
 
 PlayerObject::PlayerObject()
-    :GameObject(), Lives(5) {}
+    :GameObject(), Lives(5), frameUp(0.0f), frameWalk(0.0f), Alive(true), UpTexture(1), WalkTexture(1) {}
 
 PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity, int playerNumber)
-    : GameObject(position, size, texture, color, velocity), Lives(5)
+    : GameObject(position, size, texture, color, velocity), Lives(5), frameUp(0.0f), frameWalk(0.0f), Alive(true), UpTexture(1), WalkTexture(1)
 {
+    CollisionWith["block"] = false;
+    CollisionWith["ladder"] = false;
     if (playerNumber == 1) {
         playerMovement = PlayerMovement(GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_SPACE, GLFW_KEY_X);
     }
@@ -52,6 +54,10 @@ void PlayerObject::Shoot() {
     }
 }
 
+bool PlayerObject::isAlive() {
+    return this->Alive;
+}
+
 bool PlayerObject::PlayerAttackerCollision(GameObject& obj) {
     glm::vec2 center(obj.Position);
     // calculate AABB info (center, half-extents)
@@ -69,10 +75,8 @@ bool PlayerObject::PlayerAttackerCollision(GameObject& obj) {
     return glm::length(difference) <= obj.Size.x / 2.0f;
 }
 
-int PlayerTexture = 1;
-int PlayerUpTexture = 1;
 
-void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned int window_height, bool collided) {
+void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned int window_height) {
     std::string direction = "";
 
     if (Game::Keys[playerMovement.LEFT]) {
@@ -90,38 +94,38 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
     }
 
     if (Game::Keys[playerMovement.RIGHT] || Game::Keys[playerMovement.LEFT]) {
-        if (frameCount(dt, frameMap["character-walk"], 0.1f)) {
-            PlayerTexture = (PlayerTexture) % 4 + 1;
+        if (frameCount(dt, this->frameWalk, 0.1f)) {
+            WalkTexture = (WalkTexture) % 4 + 1;
         }
-        this->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(PlayerTexture));
+        this->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(WalkTexture));
     }
 
     if (Game::Keys[playerMovement.SHOOT1] || Game::Keys[playerMovement.SHOOT2]) {
         this->Texture = ResourceManager::GetTexture("character-shoot");
     }
 
-    if (Game::Keys[playerMovement.UP] && collided) {
-        if (collided && this->Position.y > this->Size.y / 2.0f) {
+    if (Game::Keys[playerMovement.UP] && this->CollisionWith["ladder"]) {
+        if (this->CollisionWith["ladder"] && this->Position.y > this->Size.y / 2.0f) {
             this->Position.y -= this->Velocity.y * dt;
         }
 
-        if (frameCount(dt, frameMap["character-up"], 0.1f)) {
-            PlayerUpTexture = (PlayerUpTexture) % 3 + 1;
+        if (frameCount(dt, this->frameUp, 0.1f)) {
+            UpTexture = (UpTexture) % 3 + 1;
         }
-        this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(PlayerUpTexture));
+        this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(UpTexture));
     }
 
-    if (Game::Keys[playerMovement.DOWN] && collided) {
-        if (collided && this->Position.y < window_height - this->Size.y / 2.0f) {
+    if (Game::Keys[playerMovement.DOWN] && this->CollisionWith["ladder"]) {
+        if (this->CollisionWith["ladder"] && this->Position.y < window_height - this->Size.y / 2.0f) {
             this->Position.y += this->Velocity.y * dt;
         }
         else {
             this->Texture = ResourceManager::GetTexture("character-init");
         }
 
-        if (frameCount(dt, frameMap["character-up"], 0.1f)) {
-            PlayerUpTexture = (PlayerUpTexture) % 3 + 1;
-            this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(PlayerUpTexture));
+        if (frameCount(dt, this->frameUp, 0.1f)) {
+            UpTexture = (UpTexture) % 3 + 1;
+            this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(UpTexture));
         }
     }
 
@@ -132,11 +136,11 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
         Game::KeysProcessed[playerMovement.SHOOT2] = true;
     }
 
-    if (!Game::Keys[playerMovement.RIGHT] && !Game::Keys[playerMovement.LEFT] && !Game::Keys[playerMovement.SHOOT1] && !Game::Keys[playerMovement.SHOOT2] && (!Game::Keys[playerMovement.UP] || !collided) && (!Game::Keys[playerMovement.DOWN] || !collided)) {
+    if (!Game::Keys[playerMovement.RIGHT] && !Game::Keys[playerMovement.LEFT] && !Game::Keys[playerMovement.UP] && !Game::Keys[playerMovement.DOWN] && !Game::Keys[playerMovement.SHOOT1] && !Game::Keys[playerMovement.SHOOT2] && !this->CollisionWith["ladder"]) {
         this->Texture = ResourceManager::GetTexture("character-init");
-        PlayerTexture = 1;
-        PlayerUpTexture = 1;
-        frameMap["character-up"] = frameMap["character-walk"] = 0.0f;
+        WalkTexture = 1;
+        UpTexture = 1;
+        this->frameUp = this->frameWalk = 0.0f;
     }
 }
 

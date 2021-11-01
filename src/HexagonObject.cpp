@@ -6,13 +6,13 @@ HexagonObject::HexagonObject()
 	:AttackerObject() {}
 
 HexagonObject::HexagonObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	: AttackerObject(position, size.x / 2.0f, texture, color, velocity) {}
+	: AttackerObject(position, size.x / 2.0f, texture, color, velocity), frameRotate(0.0f) {}
 
 unsigned int HexagonTexture = 1;
 
 glm::vec3& HexagonObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
 	//std::cout << HexagonTexture << std::endl;
-	if (frameCount(dt, frameMap["hexagon"], 0.1f)) {
+	if (frameCount(dt, this->frameRotate, 0.1f)) {
 		if (this->Rotation <= 360.0f) {
 			this->Rotation += 10.0f;
 		}

@@ -52,8 +52,6 @@ PowerArrowObject::PowerArrowObject(GameObject& Player, glm::vec3 velocity)
 PowerArrowObject::PowerArrowObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
 	: WeaponObject(position, size, texture, color, velocity), Stuck(false) {}
 
-float framesC1 = 0.0f;
-
 glm::vec3& PowerArrowObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
 	
 	if (this->Using && !this->Stuck) {
@@ -66,13 +64,9 @@ glm::vec3& PowerArrowObject::Move(float dt, unsigned int windowWidth, unsigned i
 		}
 	}
 	if (this->Stuck) {
-		if (framesC1 < 2.0f) {
-			framesC1 += dt;
-		}
-		else {
+		if (frameCount(dt, this->frames, 2.0f)) {
 			this->Using = false;
 			this->Stuck = false;
-			framesC1 = 0;
 		}
 	}
 	return this->Position;

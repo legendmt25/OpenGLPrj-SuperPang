@@ -35,28 +35,22 @@ void SphereRenderer::initRenderData() {
     std::vector<float> vertices;
     float x, y, z;
 
-    for (int j = 0; j < this->layers; j++) {
-        float a1 = (float)j / this->layers * PI;
-        float a2 = (float)(j + 1) / this->layers * PI;
+    for (int i = 0; i < this->layers; i++) {
+        float a1 = (float)i / this->layers * PI;
+        float a2 = (float)(i + 1) / this->layers * PI;
 
-        for (int i = 0; i <= this->squares; i++) {
-            float b = (float)i / this->squares * 2.0f * PI;
+        for (int j = 0; j <= this->squares; j++) {
+            float b = (float)j / this->squares * 2.0f * PI;
 
-            x = (float)(cos(b) * sin(a1));
-            y = (float)(sin(b) * sin(a1));
-            z = (float)(cos(a1));
-            vertices.push_back(x);
-            vertices.push_back(y);
-            vertices.push_back(z);
+            vertices.push_back(cos(b) * sin(a1));
+            vertices.push_back(sin(b) * sin(a1));
+            vertices.push_back(cos(a1));
             vertices.push_back(b / (2.0f * PI));
             vertices.push_back(a1 / PI);
 
-            x = (float)(cos(b) * sin(a2));
-            y = (float)(sin(b) * sin(a2));
-            z = (float)(cos(a2));
-            vertices.push_back(x);
-            vertices.push_back(y);
-            vertices.push_back(z);
+            vertices.push_back(cos(b) * sin(a2));
+            vertices.push_back(sin(b) * sin(a2));
+            vertices.push_back(cos(a2));
             vertices.push_back(b / (2.0f * PI));
             vertices.push_back(a2 / PI);
         }

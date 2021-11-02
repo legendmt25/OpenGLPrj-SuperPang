@@ -5,7 +5,10 @@ PowerUpObject::PowerUpObject()
 	:GameObject() {}
 
 PowerUpObject::PowerUpObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	: GameObject(position, size, texture, color, velocity) {}
+	: GameObject(position, size, texture, color, velocity)
+{
+	this->frame["DestroyPowerUp"] = 0.0f;
+}
 
 PowerUpObject::PowerUpObject(GameObject& spawnedFrom, Texture2D texture, std::string type)
 	:GameObject(spawnedFrom.Position, glm::vec3(30.0f, 30.0f, 1.0f), texture, glm::vec3(1.0f), glm::vec3(0.0f, 300.0f, 0.0f)), Type(type) {}
@@ -14,7 +17,7 @@ glm::vec3& PowerUpObject::Move(float dt, unsigned int windowWidth, unsigned int 
 	if (this->Position.y < windowHeight - this->Size.y / 2.0f) {
 		this->Position.y += this->Velocity.y * dt;
 	}
-	else if (frameCount(dt, this->frames, 10.0f)) {
+	else if (frameCount(dt, this->frame["DestroyPowerUp"], 10.0f)) {
 		this->Destroyed = true;
 	}
 	return this->Position;

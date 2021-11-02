@@ -3,11 +3,12 @@
 #include "Game.h"
 
 PlayerObject::PlayerObject()
-    :GameObject(), Lives(5), frameUp(0.0f), frameWalk(0.0f), Alive(true), UpTexture(1), WalkTexture(1) {}
+    :GameObject(), Lives(5), Alive(true), UpTexture(1), WalkTexture(1) {}
 
 PlayerObject::PlayerObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity, int playerNumber)
-    : GameObject(position, size, texture, color, velocity), Lives(5), frameUp(0.0f), frameWalk(0.0f), Alive(true), UpTexture(1), WalkTexture(1)
+    : GameObject(position, size, texture, color, velocity), Lives(5), Alive(true), UpTexture(1), WalkTexture(1)
 {
+    this->frame["Up"] = this->frame["Walk"] = 0.0f;
     CollisionWith["block"] = false;
     CollisionWith["ladder"] = false;
     if (playerNumber == 1) {
@@ -94,7 +95,7 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
     }
 
     if (Game::Keys[playerMovement.RIGHT] || Game::Keys[playerMovement.LEFT]) {
-        if (frameCount(dt, this->frameWalk, 0.1f)) {
+        if (frameCount(dt, this->frame["Walk"], 0.1f)) {
             WalkTexture = (WalkTexture) % 4 + 1;
         }
         this->Texture = ResourceManager::GetTexture("character-walk" + direction + std::to_string(WalkTexture));
@@ -109,7 +110,7 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
             this->Position.y -= this->Velocity.y * dt;
         }
 
-        if (frameCount(dt, this->frameUp, 0.1f)) {
+        if (frameCount(dt, this->frame["Up"], 0.1f)) {
             UpTexture = (UpTexture) % 3 + 1;
         }
         this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(UpTexture));
@@ -123,7 +124,7 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
             this->Texture = ResourceManager::GetTexture("character-init");
         }
 
-        if (frameCount(dt, this->frameUp, 0.1f)) {
+        if (frameCount(dt, this->frame["Up"], 0.1f)) {
             UpTexture = (UpTexture) % 3 + 1;
             this->Texture = ResourceManager::GetTexture("character-up-" + std::to_string(UpTexture));
         }
@@ -140,7 +141,7 @@ void PlayerObject::ProcessInput(float dt, unsigned int window_width, unsigned in
         this->Texture = ResourceManager::GetTexture("character-init");
         WalkTexture = 1;
         UpTexture = 1;
-        this->frameUp = this->frameWalk = 0.0f;
+        this->frame["Up"] = this->frame["Walk"] = 0.0f;
     }
 }
 

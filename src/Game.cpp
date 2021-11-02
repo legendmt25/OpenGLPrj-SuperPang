@@ -114,7 +114,7 @@ void Game::Init()
 {
     this->LoadFiles();
 
-    PlayingPlayers = &this->Menu->findOptionByName("PLAYERS")->Value->getValue();
+    PlayingPlayers = &dynamic_cast<CounterValue*>(this->Menu->findOptionByName("PLAYERS")->Value)->getValue();
     ResourceManager::GetShader("sprite").SetInteger("image", 0, true);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", glm::ortho(0.0f, (float)this->Width, (float)this->Height, 0.0f, -1.0f, 1.0f));
 
@@ -129,7 +129,6 @@ void Game::Init()
     
     //init objects
     Players.push_back(new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity, 1));
-    //Players.push_back(new PlayerObject(glm::vec3(0.0f), glm::vec3(PlayerSize.x, PlayerSize.y, PlayerSize.z), ResourceManager::GetTexture("character-init"), glm::vec3(1.0f), PlayerVelocity, 2));
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Renderer3D = new Sprite3DRenderer(ResourceManager::GetShader("sprite3D"));
     RendererSphere_36sectors_18stacks = new SphereRenderer(ResourceManager::GetShader("sprite3D"), 18, 36);
@@ -371,10 +370,11 @@ void Game::Render()
             }
         }
 
-       float offset = 20.0f;
+       float offset = 20.0f * Players.size();
+       unsigned short int c = 1;
        for (auto& Player : Players) {
-           Text->RenderText("Lives:" + std::to_string(Player->Lives), 5.0f, this->Height - offset, 1.0f);
-           offset += 20.0f;
+           Text->RenderText("Player " + std::to_string(c++) + ": Lives:" + std::to_string(Player->Lives), 5.0f, this->Height - offset, 1.0f);
+           offset -= 20.0f;
        }
 
         if (this->State == GAME_PAUSE) {
@@ -582,6 +582,7 @@ void Game::DoCollisions() {
                 else {
                     --Player->Lives;
                     Player->Alive = false;
+                    Player->ResetWeapons();
                     wasSleeping = false;
 
                     if (!anyPlayerAlive()) {

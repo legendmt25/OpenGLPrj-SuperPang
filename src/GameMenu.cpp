@@ -9,7 +9,7 @@ void Option::Draw(TextRenderer& Renderer) {
 		if (i == this->Selected) {
 			std::string strValue = "";
 			if (option->Value) {
-				strValue = " - " + std::to_string(option->Value->getValue());
+				strValue = " - " + option->Value->toString();
 			}
 			Renderer.RenderText("->" + option->Name + strValue , option->Position.x - strValue.size() * FontSize / 2.0f, option->Position.y, 1.0f);
 			continue;
@@ -128,4 +128,12 @@ GameMenu::~GameMenu() {
 	}
 	this->DestroyRecursive(this->Selected->Options);
 	delete this->Selected;
+}
+
+void CounterValue::Action()
+{
+	++this->value;
+	if (this->value > this->to) {
+		this->value = this->from;
+	}
 }

@@ -8,7 +8,6 @@ enum Direction {
 	UP, RIGHT, DOWN, LEFT 
 };
 
-
 Direction VectorDirection(glm::vec2 target);
 bool frameCount(const float& dt, float& frame, float toFrame);
 

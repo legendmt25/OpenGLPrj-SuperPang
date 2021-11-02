@@ -9,29 +9,43 @@
 #include "TextRenderer.h"
 
 class OptionValue {
-protected:
-	int value;
 public:
-	OptionValue(int value = 0) :value(value) {}
+	OptionValue() = default;
 	virtual void Action() = 0;
-	virtual int& getValue() {
+	virtual std::string toString() = 0;
+};
+
+class OptionWithoutValue: public OptionValue {
+	void Action() {
+		return;
+	}
+	virtual std::string toString() {
+		return "";
+	}
+};
+
+template<class T>
+class OptionWithValue : public OptionValue {
+protected:
+	T value;
+public:
+	OptionWithValue(int value = 0) :value(value) {}
+	virtual void Action() = 0;
+	virtual std::string toString() = 0;
+	virtual T& getValue() {
 		return this->value;
 	}
 };
 
-
-class CounterValue : public OptionValue {
-	int from, to;
+class CounterValue : public OptionWithValue<int> {
+	unsigned short int from, to;
 public:
-	CounterValue(int from, int to) : OptionValue(from), from(from), to(to) {}
-	void Action() {
-		++this->value;
-		if (this->value > this->to) {
-			this->value = this->from;
-		}
+	CounterValue(int from, int to) : OptionWithValue(from), from(from), to(to) {}
+	void Action();
+	std::string toString() {
+		return std::to_string(this->getValue());
 	}
 };
-
 
 class Option {
 public:

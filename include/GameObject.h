@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 #include "Texture.h"
 #include "SpriteRenderer.h"
@@ -9,7 +10,7 @@
 class GameObject
 {
 protected:
-	float frames = 0.0f;
+	std::unordered_map<std::string, float> frame;
 public:
 	glm::vec3 Position, Size, Velocity, Color;
 	float Rotation;

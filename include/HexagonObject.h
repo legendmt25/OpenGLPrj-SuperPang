@@ -10,7 +10,4 @@ public:
 	glm::vec3& Move(float dt, unsigned int window_width, unsigned int window_height);
 	void Reset(glm::vec3 position, glm::vec3 velocity);
 	void Pop(float dt);
-
-private:
-	float frameRotate;
 };

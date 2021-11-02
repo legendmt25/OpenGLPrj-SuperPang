@@ -3,16 +3,20 @@
 #include "ResourceManager.h"
 
 HexagonObject::HexagonObject()
-	:AttackerObject() {}
+	:AttackerObject() {
+	this->frame["Rotate"] = this->frame["Pop"] = 0.0f;
+}
 
 HexagonObject::HexagonObject(glm::vec3 position, glm::vec3 size, Texture2D texture, glm::vec3 color, glm::vec3 velocity)
-	: AttackerObject(position, size.x / 2.0f, texture, color, velocity), frameRotate(0.0f) {}
+	: AttackerObject(position, size.x / 2.0f, texture, color, velocity)
+{
+	this->frame["Rotate"] = this->frame["Pop"] = 0.0f;
+}
 
 unsigned int HexagonTexture = 1;
 
 glm::vec3& HexagonObject::Move(float dt, unsigned int windowWidth, unsigned int windowHeight) {
-	//std::cout << HexagonTexture << std::endl;
-	if (frameCount(dt, this->frameRotate, 0.1f)) {
+	if (frameCount(dt, this->frame["Rotate"], 0.1f)) {
 		if (this->Rotation <= 360.0f) {
 			this->Rotation += 10.0f;
 		}
@@ -48,7 +52,7 @@ unsigned int PopTextureHexagon = 1;
 void HexagonObject::Pop(float dt) {
 	if (this->pop) {
 		if (PopTextureHexagon < 5) {
-			if (frameCount(dt, frames, 0.005f)) {
+			if (frameCount(dt, this->frame["Pop"], 0.005f)) {
 				this->Texture = ResourceManager::GetTexture("ball-pop-" + std::to_string(PopTextureHexagon));
 				++PopTextureHexagon;
 			}

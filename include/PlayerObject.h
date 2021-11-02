@@ -39,7 +39,5 @@ public:
 	glm::vec3& Move(float dt, unsigned int windowWidth, unsigned int windowHeight);
 private:
 	PlayerMovement playerMovement;
-	float frameUp;
-	float frameWalk;
 	unsigned short int UpTexture, WalkTexture;
 };

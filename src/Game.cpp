@@ -94,8 +94,6 @@ void Game::LoadFiles() {
         }
     }
 
-
-
     //load levels
     for (auto& file : std::experimental::filesystem::directory_iterator("../resources/levels/")) {
         if (file.path().extension().string() == "") {
